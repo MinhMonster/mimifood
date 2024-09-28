@@ -26,6 +26,6 @@ Route::get('/products/{link}', [ProductsController::class, 'show'])->name('produ
 // admin
 Route::group(['prefix' => 'admin'], function () {
     Route::get('/products', [AdminProductsController::class, 'index'])->name('admin.products.index');
-    Route::post('/products', [AdminProductsController::class, 'create'])->name('admin.products.create');
+    Route::post('/products', [AdminProductsController::class, 'modify'])->name('admin.products.modify');
     Route::get('/products/{id}', [AdminProductsController::class, 'show'])->name('admin.products.show');
 });

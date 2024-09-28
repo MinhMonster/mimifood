@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 use App\Models\Admin\Products; // Import model
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 use Illuminate\Http\Request;
 
@@ -21,25 +23,47 @@ class ProductsController extends Controller
     /**
      * Lưu trữ sản phẩm mới vào cơ sở dữ liệu.
      */
-    public function create(Request $request)
+    public function modify(Request $request)
     {
         // 1. Xác thực dữ liệu
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'link' => 'required|string',
+            'link' => [
+                'required',
+                'string',
+                'unique:products,link',
+            ],
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'quantity' => 'nullable|integer',
         ]);
 
-        // 2. Lưu dữ liệu vào cơ sở dữ liệu
-        $product = new Products();
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        if($request->id) {
+            $product = Products::withTrashed()->find($request->id);
+        } else {
+            $product = new Products();
+        }
+
         $product->name = $request->input('name');
         $product->link = $request->input('link');
         $product->price = $request->input('price');
         $product->description = $request->input('description');
         $product->quantity = $request->input('quantity', 0);  // Mặc định là 0 nếu không có giá trị
-        $product->save();  // Lưu vào database
+
+        if($request->id) {
+            $product->update();
+        } else {
+            $product->save();  // Lưu vào database
+        }
+
         return $product;
     }
 
@@ -52,29 +76,6 @@ class ProductsController extends Controller
         return response()->json($product);
     }
 
-    /**
-     * Hiển thị form chỉnh sửa sản phẩm cụ thể.
-     */
-    public function edit(Product $product)
-    {
-        return view('products.edit', compact('product'));
-    }
-
-    /**
-     * Cập nhật sản phẩm cụ thể trong cơ sở dữ liệu.
-     */
-    public function update(Request $request, Product $product)
-    {
-        $request->validate([
-            'name' => 'required',
-            'price' => 'required|numeric',
-        ]);
-
-        $product->update($request->all());
-
-        return redirect()->route('products.index')
-                         ->with('success', 'Product updated successfully.');
-    }
 
     /**
      * Xóa sản phẩm cụ thể khỏi cơ sở dữ liệu.
