@@ -13,11 +13,11 @@ class ProductsController extends Controller
     /**
      * Hiển thị danh sách các sản phẩm.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Products::withTrashed()->get();
+        $products = Products::withTrashed();
 
-        return response()->json($products);
+        return formatPaginate($products, $request);
     }
 
     /**
@@ -26,16 +26,18 @@ class ProductsController extends Controller
     public function modify(Request $request)
     {
         // 1. Xác thực dữ liệu
-        $validator = Validator::make($request->all(), [
+        $input = $request->input('input');
+        $validator = Validator::make($input, [
             'name' => 'required|string|max:255',
             'link' => [
                 'required',
                 'string',
-                'unique:products,link',
+                'unique:products,link,' . ($input['id'] ?? '')
             ],
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'quantity' => 'nullable|integer',
+            'images' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -52,11 +54,12 @@ class ProductsController extends Controller
             $product = new Products();
         }
 
-        $product->name = $request->input('name');
-        $product->link = $request->input('link');
-        $product->price = $request->input('price');
-        $product->description = $request->input('description');
-        $product->quantity = $request->input('quantity', 0);  // Mặc định là 0 nếu không có giá trị
+        $product->name = $input['name'];
+        $product->link = $input['link'];
+        $product->price = $input['price'];
+        $product->description = $input['description'];
+        $product->quantity = $input['quantity'] ?? 0;  // Mặc định là 0 nếu không có giá trị
+        $product->images = $input['images'] ?? [];
 
         if($request->id) {
             $product->update();
@@ -73,7 +76,7 @@ class ProductsController extends Controller
     public function show(Products $product, Request $request)
     {
         $product = Products::withTrashed()->find($request->id);
-        return response()->json($product);
+        return fetchData($product);
     }
 
 
