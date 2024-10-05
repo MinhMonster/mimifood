@@ -21,6 +21,7 @@ class Products extends Model
 
     protected $hidden = ['id', 'created_at', 'updated_at', 'deleted_at', 'author_id'];
 
+    protected $appends = ['avatar'];
 
     /**
      * Các trường kiểu JSON
@@ -30,4 +31,9 @@ class Products extends Model
     protected $casts = [
         'images' => 'array',  // Laravel sẽ tự động chuyển cột images thành array khi truy xuất
     ];
+
+    public function getAvatarAttribute()
+    {
+        return $this->images[0] ?? config('common.image_empty');
+    }
 }
