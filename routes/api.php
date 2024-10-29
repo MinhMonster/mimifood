@@ -6,6 +6,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
+use App\Http\Controllers\Admin\FolderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,4 +39,5 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/products', [AdminProductsController::class, 'index'])->name('admin.products.index');
     Route::post('/products', [AdminProductsController::class, 'modify'])->name('admin.products.modify');
     Route::get('/products/{id}', [AdminProductsController::class, 'show'])->name('admin.products.show');
+    Route::post('/folders', [FolderController::class, 'create'])->name('admin.folders.create');
 });
