@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\FolderController;
+use App\Http\Controllers\Admin\FileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,5 +40,10 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/products', [AdminProductsController::class, 'index'])->name('admin.products.index');
     Route::post('/products', [AdminProductsController::class, 'modify'])->name('admin.products.modify');
     Route::get('/products/{id}', [AdminProductsController::class, 'show'])->name('admin.products.show');
+
+    Route::get('/folders', [FolderController::class, 'index'])->name('admin.folders.index');
     Route::post('/folders', [FolderController::class, 'create'])->name('admin.folders.create');
+    Route::post('/files', [FileController::class, 'index'])->name('admin.files.index');
+    Route::post('/files/uploads', [FileController::class, 'uploads'])->name('admin.files.uploads');
+    Route::delete('/files/{id}', [FileController::class, 'delete'])->name('admin.files.delete');
 });
