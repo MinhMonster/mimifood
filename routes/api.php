@@ -42,7 +42,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/products/{id}', [AdminProductsController::class, 'show'])->name('admin.products.show');
 
     Route::get('/folders', [FolderController::class, 'index'])->name('admin.folders.index');
-    Route::post('/folders', [FolderController::class, 'create'])->name('admin.folders.create');
+    Route::post('/folders/create', [FolderController::class, 'create'])->name('admin.folders.create');
+    Route::post('/folders/update', [FolderController::class, 'update'])->name('admin.folders.update');
     Route::post('/files', [FileController::class, 'index'])->name('admin.files.index');
     Route::post('/files/uploads', [FileController::class, 'uploads'])->name('admin.files.uploads');
     Route::delete('/files/{id}', [FileController::class, 'delete'])->name('admin.files.delete');
