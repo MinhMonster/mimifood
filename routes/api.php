@@ -46,5 +46,5 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/folders/update', [FolderController::class, 'update'])->name('admin.folders.update');
     Route::post('/files', [FileController::class, 'index'])->name('admin.files.index');
     Route::post('/files/uploads', [FileController::class, 'uploads'])->name('admin.files.uploads');
-    Route::delete('/files/{id}', [FileController::class, 'delete'])->name('admin.files.delete');
+    Route::delete('/files/{id}/delete', [FileController::class, 'delete'])->name('admin.files.delete');
 });
