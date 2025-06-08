@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Admin; // Thay thế 'App\Models\Admin' bằng namespace của model Admin của bạn
+use App\Models\Admin;
 
 class AdminSeeder extends Seeder
 {
@@ -17,8 +17,7 @@ class AdminSeeder extends Seeder
         Admin::create([
             'name' => 'Admin',
             'email' => 'admin@example.com',
-            'password' => bcrypt('password'), // Mã hóa mật khẩu bằng bcrypt
-            // Các trường khác tùy thuộc vào cấu hình model Admin của bạn
+            'password' => bcrypt('adminmms12345'),
         ]);
     }
 }

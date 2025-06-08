@@ -1,0 +1,63 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateNinjasTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('ninjas', function (Blueprint $table) {
+            $table->id();
+
+            $table->string('username');
+            $table->string('password')->nullable();
+            $table->string('character_name');
+            $table->json('images');
+            $table->boolean('is_full_image');
+            $table->decimal('selling_price', 10, 0)->nullable();
+            $table->decimal('purchase_price', 10, 0)->nullable();
+            $table->decimal('discount_percent', 5, 0)->nullable();
+
+            $table->string('class');
+            $table->integer('level');
+            $table->string('server');
+            $table->string('type');
+            $table->text('description');
+            $table->integer('weapon');
+            for ($i = 1; $i <= 10; $i++) {
+                $table->string("tl{$i}")->nullable();
+            }
+            $table->integer('yoroi')->nullable();
+            $table->integer('eye')->nullable();
+            $table->integer('book')->nullable();
+            $table->integer('cake')->nullable();
+
+            $table->text('clone')->nullable();
+            $table->text('yen')->nullable();
+            $table->text('disguise')->nullable();
+            $table->text('mounts')->nullable();
+
+            $table->unsignedBigInteger('author_id')->default(1);
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('ninjas');
+    }
+}

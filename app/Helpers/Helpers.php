@@ -1,43 +1,49 @@
 <?php
 
 if (!function_exists('format_date')) {
-    function format_date($date, $format = 'Y-m-d H:i:s') {
+    function format_date($date, $format = 'Y-m-d H:i:s')
+    {
         return \Carbon\Carbon::parse($date)->format($format);
     }
 }
 
 if (!function_exists('is_active')) {
-    function is_active($routeName) {
+    function is_active($routeName)
+    {
         return request()->routeIs($routeName) ? 'active' : '';
     }
 }
 
 if (!function_exists('formatPaginate')) {
-    function formatPaginate($response, $request) {
-        $input = json_decode($request['input']);
-        $response = collect($response->paginate($input->perPage ?? 30));
+    function formatPaginate($query, $request)
+    {
+        $input = json_decode($request['input'] ?? '{}');
+        $pagination = $query->paginate($input->perPage ?? 30, ['*'], 'page', $input->page ?? 1);
         $response = [
             'response' => [
-                'count' => $response['total'],
-                'data' => $response['data'],
+                'count' => $pagination->total(),
+                'data' => $pagination->items(),
                 'meta' => [
-                    'count' => $response['total'],
-                    'page' => $response['current_page'],
-                    'pages'=> $response['last_page'],
-                    'per_page'=> $response['per_page'],
-                    'from' => $response['from'],
-                    'to'=> $response['to'],
+                    'count' => $pagination->total(),
+                    'page' => $pagination->currentPage(),
+                    'pages' => $pagination->lastPage(),
+                    'per_page' => $pagination->perPage(),
+                    'from' => $pagination->firstItem(),
+                    'to' => $pagination->lastItem(),
                 ]
-            ]
+            ],
+            'message' => 'Successs'
         ];
         return response()->json($response);
     }
 }
 
 if (!function_exists('fetchData')) {
-    function fetchData($response) {
+    function fetchData($response)
+    {
         $response = [
-            'response' => $response
+            'response' => $response,
+            'message' => 'Successs'
         ];
 
         return response()->json($response);

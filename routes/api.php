@@ -6,6 +6,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
+use App\Http\Controllers\Admin\NinjasController as AdminNinjasController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\FileController;
 
@@ -31,7 +32,7 @@ Route::get('/products', [ProductsController::class, 'index'])->name('products.in
 Route::get('/products/{link}', [ProductsController::class, 'show'])->name('products.show');
 
 // user
-Route::group(['middleware' => 'is_user'], function() {
+Route::group(['middleware' => 'is_user'], function () {
     // ...
 });
 
@@ -47,4 +48,11 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/files', [FileController::class, 'index'])->name('admin.files.index');
     Route::post('/files/uploads', [FileController::class, 'uploads'])->name('admin.files.uploads');
     Route::delete('/files/{id}/delete', [FileController::class, 'delete'])->name('admin.files.delete');
+    Route::group(['prefix' => 'game'], function () {
+        Route::get('/ninjas', [AdminNinjasController::class, 'index'])->name('admin.ninjas.index');
+        Route::post('/ninjas/modify', [AdminNinjasController::class, 'modify'])->name('admin.ninjas.modify');
+        Route::post('/ninjas/destroy', [AdminNinjasController::class, 'destroy'])->name('admin.ninjas.destroy');
+        Route::post('/ninjas/restore', [AdminNinjasController::class, 'restore'])->name('admin.ninjas.restore');
+        Route::get('/ninjas/{id}', [AdminNinjasController::class, 'show'])->name('admin.ninjas.show');
+    });
 });
