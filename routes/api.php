@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\NinjasController as AdminNinjasController;
+use App\Http\Controllers\Admin\AvatarsController as AdminAvatarsController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\FileController;
 
@@ -49,10 +50,17 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/files/uploads', [FileController::class, 'uploads'])->name('admin.files.uploads');
     Route::delete('/files/{id}/delete', [FileController::class, 'delete'])->name('admin.files.delete');
     Route::group(['prefix' => 'game'], function () {
+        // Admin Ninja
         Route::get('/ninjas', [AdminNinjasController::class, 'index'])->name('admin.ninjas.index');
         Route::post('/ninjas/modify', [AdminNinjasController::class, 'modify'])->name('admin.ninjas.modify');
         Route::post('/ninjas/destroy', [AdminNinjasController::class, 'destroy'])->name('admin.ninjas.destroy');
         Route::post('/ninjas/restore', [AdminNinjasController::class, 'restore'])->name('admin.ninjas.restore');
         Route::get('/ninjas/{id}', [AdminNinjasController::class, 'show'])->name('admin.ninjas.show');
+        // Admin Avatar
+        Route::get('/avatars', [AdminAvatarsController::class, 'index'])->name('admin.avatars.index');
+        Route::post('/avatars/modify', [AdminAvatarsController::class, 'modify'])->name('admin.avatars.modify');
+        Route::post('/avatars/destroy', [AdminAvatarsController::class, 'destroy'])->name('admin.avatars.destroy');
+        Route::post('/avatars/restore', [AdminAvatarsController::class, 'restore'])->name('admin.avatars.restore');
+        Route::get('/avatars/{id}', [AdminAvatarsController::class, 'show'])->name('admin.avatars.show');
     });
 });
