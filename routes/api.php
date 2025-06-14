@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\NinjasController as AdminNinjasController;
 use App\Http\Controllers\Admin\AvatarsController as AdminAvatarsController;
+use App\Http\Controllers\Admin\DiscountsController as AdminDiscountsController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\FileController;
 
@@ -63,4 +64,10 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/avatars/restore', [AdminAvatarsController::class, 'restore'])->name('admin.avatars.restore');
         Route::get('/avatars/{id}', [AdminAvatarsController::class, 'show'])->name('admin.avatars.show');
     });
+    // Admin Discount
+        Route::get('/discounts', [AdminDiscountsController::class, 'index'])->name('admin.discounts.index');
+        Route::post('/discounts/modify', [AdminDiscountsController::class, 'modify'])->name('admin.discounts.modify');
+        Route::post('/discounts/destroy', [AdminDiscountsController::class, 'destroy'])->name('admin.discounts.destroy');
+        Route::post('/discounts/restore', [AdminDiscountsController::class, 'restore'])->name('admin.discounts.restore');
+        Route::get('/discounts/{id}', [AdminDiscountsController::class, 'show'])->name('admin.discounts.show');
 });
