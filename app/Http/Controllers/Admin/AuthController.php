@@ -17,19 +17,21 @@ class AuthController extends Controller
 
         try {
             // use guard 'admin-api' for login
-            if (!$token = Auth::guard('admin-api')->attempt($credentials)) {
-                return response()->json(['error' => 'Invalid Credentials'], 401);
+            if (! $token = Auth::guard('admin-api')->attempt($credentials)) {
+                return response()->json(['error' => 'Invalid credentials'], 401);
             }
+
+            $user = Auth::guard('admin-api')->user();
+
+            return response()->json([
+                'access_token' => $token,
+                'token_type'   => 'bearer',
+                'expires_in'   => Auth::guard('admin-api')->factory()->getTTL() * 60,
+                'user'         => $user,
+            ]);
         } catch (JWTException $e) {
             return response()->json(['error' => 'Could not create token'], 500);
         }
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type'   => 'bearer',
-            'expires_in'   => Auth::guard('admin-api')->factory()->getTTL() * 60,
-            'user'         => Auth::guard('admin-api')->user()
-        ]);
     }
 
     public function logout()

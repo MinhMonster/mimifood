@@ -2,20 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Admin extends Model implements JWTSubject, Authenticatable
+class Admin extends Authenticatable implements JWTSubject
 {
-    use HasFactory;
-
-    // ... các thuộc tính và phương thức khác
-
-    use HasApiTokens, Notifiable; // Sử dụng trait Notifiable
+    use HasApiTokens, Notifiable;
 
     protected $fillable = [
         'name',
@@ -23,52 +17,14 @@ class Admin extends Model implements JWTSubject, Authenticatable
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-    public function getAuthPassword()
-    {
-        return $this->password;
-    }
-    public function getRememberTokenName()
-    {
-        return 'remember_token';
-    }
-    public function getAuthIdentifierName()
-    {
-        return 'email';
-    }
-
-    public function getAuthIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    public function getRememberToken()
-    {
-        return $this->remember_token;
-    }
-
-    public function setRememberToken($value)
-    {
-        $this->remember_token = $value;
-    }
 
     public function getJWTIdentifier()
     {
