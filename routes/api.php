@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\NinjasController as AdminNinjasController;
 use App\Http\Controllers\Admin\AvatarsController as AdminAvatarsController;
@@ -39,6 +40,8 @@ Route::group(['middleware' => 'is_user'], function () {
 });
 
 // admin
+Route::post('/admin/login', [AdminAuthController::class, 'login']);
+// Route::post('/admin/register', [AdminAuthController::class, 'register']);
 Route::group(['prefix' => 'admin'], function () {
     Route::get('/products', [AdminProductsController::class, 'index'])->name('admin.products.index');
     Route::post('/products', [AdminProductsController::class, 'modify'])->name('admin.products.modify');
