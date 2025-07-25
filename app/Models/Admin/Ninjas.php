@@ -11,11 +11,7 @@ class Ninjas extends Model
 {
     use HasFactory, SoftDeletes;
 
-    /**
-     *
-     *
-     * @var array
-     */
+    protected $appends = ['active_discount'];
     protected $fillable = [
         'username',
         'password',
@@ -48,7 +44,7 @@ class Ninjas extends Model
         'yen',
         'clone',
         'disguise',
-        'mounts'
+        'mounts',
     ];
 
     /**
@@ -96,5 +92,13 @@ class Ninjas extends Model
                 $q->orWhere('character_name', 'like', "%{$input->character_name}%");
             }
         });
+    }
+
+    public function getActiveDiscountAttribute()
+    {
+        $discount = Discounts::where('type', 'ninja')
+            ->where('is_active', true)
+            ->first();
+        return calculatePercentFromTiers($discount->price_tiers ?? [], $this->selling_price);
     }
 }

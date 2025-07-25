@@ -49,3 +49,16 @@ if (!function_exists('fetchData')) {
         return response()->json($response);
     }
 }
+
+if (!function_exists('calculatePercentFromTiers')) {
+    function calculatePercentFromTiers($priceTiers, $price): int
+    {
+        if (empty($priceTiers)) return 0;
+        foreach ($priceTiers as $tier) {
+            if ($price <= $tier['price']) {
+                return $tier['value'];
+            }
+        }
+        return end($priceTiers)['value'] ?? 0;
+    }
+}
