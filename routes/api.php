@@ -6,6 +6,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\NinjasController;
+use App\Http\Controllers\AvatarsController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\NinjasController as AdminNinjasController;
@@ -37,7 +38,8 @@ Route::get('/products/{link}', [ProductsController::class, 'show'])->name('produ
 
 Route::get('/ninjas', [NinjasController::class, 'index'])->name('ninjas.index');
 Route::get('/ninjas/{id}', [NinjasController::class, 'show'])->name('ninjas.show');
-
+Route::get('/avatars', [AvatarsController::class, 'index'])->name('avatars.index');
+Route::get('/avatars/{id}', [AvatarsController::class, 'show'])->name('avatars.show');
 // user
 Route::group(['middleware' => 'is_user'], function () {
     // ...
