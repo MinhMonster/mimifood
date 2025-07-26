@@ -94,11 +94,18 @@ class Ninjas extends Model
         });
     }
 
-    public function getActiveDiscountAttribute()
+    public function discount()
     {
-        $discount = Discounts::where('type', 'ninja')
+        return Discounts::where('type', 'ninja')
             ->where('is_active', true)
             ->first();
-        return calculatePercentFromTiers($discount->price_tiers ?? [], $this->selling_price);
+    }
+
+    public function getActiveDiscountAttribute()
+    {
+        return calculatePercentFromTiers(
+            $this->discount()->price_tiers ?? [],
+            $this->selling_price
+        );
     }
 }
