@@ -8,4 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 class Discounts extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'type',
+        'value',
+        'start_date',
+        'end_date',
+        'is_active',
+        'price_tiers'
+    ];
+
+    protected $casts = [
+        'price_tiers' => 'array',
+        'is_active' => 'boolean',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+    ];
 }

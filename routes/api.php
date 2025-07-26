@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\NinjasController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\NinjasController as AdminNinjasController;
@@ -33,6 +34,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
 Route::get('/products/{link}', [ProductsController::class, 'show'])->name('products.show');
+
+Route::get('/ninjas', [NinjasController::class, 'index'])->name('ninjas.index');
+Route::get('/ninjas/{id}', [NinjasController::class, 'show'])->name('ninjas.show');
 
 // user
 Route::group(['middleware' => 'is_user'], function () {

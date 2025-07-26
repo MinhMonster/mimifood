@@ -9,7 +9,8 @@ use Illuminate\Http\Request;
 
 class Avatars extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     protected $appends = ['active_discount'];
 
@@ -27,11 +28,6 @@ class Avatars extends Model
         'sex'
     ];
 
-    /**
-     *
-     *
-     * @var array
-     */
     protected $casts = [
         'images' => 'array',
     ];
