@@ -24,15 +24,15 @@ class CreateNinjasTable extends Migration
             $table->decimal('selling_price', 10, 0)->nullable();
             $table->decimal('purchase_price', 10, 0)->nullable();
             $table->decimal('discount_percent', 5, 0)->nullable();
-
-            $table->string('class');
-            $table->integer('level');
-            $table->string('server');
-            $table->string('type');
             $table->text('description');
+
+            $table->integer('class');
+            $table->integer('level');
+            $table->integer('server');
+            $table->integer('type');
             $table->integer('weapon');
             for ($i = 1; $i <= 10; $i++) {
-                $table->string("tl{$i}")->nullable();
+                $table->integer("tl{$i}")->nullable();
             }
             $table->integer('yoroi')->nullable();
             $table->integer('eye')->nullable();
