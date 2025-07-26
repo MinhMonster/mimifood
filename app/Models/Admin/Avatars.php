@@ -11,11 +11,8 @@ class Avatars extends Model
 {
     use HasFactory, SoftDeletes;
 
-    /**
-     *
-     *
-     * @var array
-     */
+    protected $appends = ['active_discount'];
+
     protected $fillable = [
         'username',
         'description',
@@ -71,5 +68,13 @@ class Avatars extends Model
                 $q->orWhere('username', 'like', "%{$input->username}%");
             }
         });
+    }
+
+    public function getActiveDiscountAttribute()
+    {
+        $discount = Discounts::where('type', 'avatar')
+            ->where('is_active', true)
+            ->first();
+        return calculatePercentFromTiers($discount->price_tiers ?? [], $this->selling_price);
     }
 }
