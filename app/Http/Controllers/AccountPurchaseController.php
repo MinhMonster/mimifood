@@ -13,6 +13,30 @@ use App\Models\AccountPurchaseHistory;
 
 class AccountPurchaseController extends Controller
 {
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+        $query = AccountPurchaseHistory::query()->where('user_id', $user->id);
+        return formatPaginate($query, $request);
+    }
+
+    public function show(Request $request)
+    {
+        $user = Auth::user();
+        $history = AccountPurchaseHistory::query()
+            ->where('user_id', $user->id)
+            ->where('id', $request->id)->first();
+
+        if (!$history) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'History not found',
+            ], 404);
+        }
+
+        return fetchData($history);
+    }
+
     public function purchase(Request $request)
     {
         $validator = Validator::make($request->all(), [

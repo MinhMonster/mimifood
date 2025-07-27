@@ -40,8 +40,10 @@ Route::get('/avatars', [AvatarsController::class, 'index'])->name('avatars.index
 Route::get('/avatars/{id}', [AvatarsController::class, 'show'])->name('avatars.show');
 // user
 Route::group(['middleware' => 'is_user'], function () {
-    Route::get('/user', [UserController::class, 'user'])->name('user');;
+    Route::get('/user', [UserController::class, 'user'])->name('user');
     Route::post('/account-purchase', [AccountPurchaseController::class, 'purchase']);
+    Route::get('/account-purchase-histories', [AccountPurchaseController::class, 'index']);
+    Route::get('/account-purchase-histories/{id}', [AccountPurchaseController::class, 'show']);
 });
 
 // admin
