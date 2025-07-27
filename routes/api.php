@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\NinjasController;
 use App\Http\Controllers\AvatarsController;
@@ -29,9 +30,6 @@ use App\Http\Controllers\Admin\FileController;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [RegisterController::class, 'register']);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
 Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
 Route::get('/products/{link}', [ProductsController::class, 'show'])->name('products.show');
@@ -42,7 +40,7 @@ Route::get('/avatars', [AvatarsController::class, 'index'])->name('avatars.index
 Route::get('/avatars/{id}', [AvatarsController::class, 'show'])->name('avatars.show');
 // user
 Route::group(['middleware' => 'is_user'], function () {
-    // ...
+    Route::get('/user', [UserController::class, 'user'])->name('user');;
 });
 
 // admin
@@ -74,9 +72,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
         Route::get('/avatars/{id}', [AdminAvatarsController::class, 'show'])->name('admin.avatars.show');
     });
     // Admin Discount
-        Route::get('/discounts', [AdminDiscountsController::class, 'index'])->name('admin.discounts.index');
-        Route::post('/discounts/modify', [AdminDiscountsController::class, 'modify'])->name('admin.discounts.modify');
-        Route::post('/discounts/destroy', [AdminDiscountsController::class, 'destroy'])->name('admin.discounts.destroy');
-        Route::post('/discounts/restore', [AdminDiscountsController::class, 'restore'])->name('admin.discounts.restore');
-        Route::get('/discounts/{id}', [AdminDiscountsController::class, 'show'])->name('admin.discounts.show');
+    Route::get('/discounts', [AdminDiscountsController::class, 'index'])->name('admin.discounts.index');
+    Route::post('/discounts/modify', [AdminDiscountsController::class, 'modify'])->name('admin.discounts.modify');
+    Route::post('/discounts/destroy', [AdminDiscountsController::class, 'destroy'])->name('admin.discounts.destroy');
+    Route::post('/discounts/restore', [AdminDiscountsController::class, 'restore'])->name('admin.discounts.restore');
+    Route::get('/discounts/{id}', [AdminDiscountsController::class, 'show'])->name('admin.discounts.show');
 });

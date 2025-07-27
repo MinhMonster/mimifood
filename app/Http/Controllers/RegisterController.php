@@ -15,13 +15,13 @@ class RegisterController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'phone' => $request->phone,
         ]);
 
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
             'message' => 'User registered successfully',
-            'user' => $user,
             'token' => $token
         ], 201);
     }

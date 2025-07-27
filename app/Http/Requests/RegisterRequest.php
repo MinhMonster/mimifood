@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Requests;
+
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
@@ -29,6 +31,8 @@ class RegisterRequest extends FormRequest
             'name'     => 'name',
             'email'    => 'email',
             'password' => 'password',
+            'password_confirmation' => 'password_confirmation',
+            'phone' => 'phone'
         ];
     }
 
@@ -43,6 +47,12 @@ class RegisterRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'password_confirmation' => 'required',
+            'phone' => [
+                'required',
+                'regex:/^(0|\+84)[0-9]{9}$/',
+                'unique:users',
+            ],
         ];
     }
 
@@ -54,9 +64,11 @@ class RegisterRequest extends FormRequest
     public function messages()
     {
         return [
-            'name' => 'name',
-            'email' => 'email',
-            'password' => 'password',
+            'name' => 'Tên hiển thị',
+            'email' => 'Email',
+            'password' => 'Mật khẩu',
+            'password_confirmation' => 'Mật khẩu nhập lại',
+            'phone' => 'Số điện thoại',
         ];
     }
 
