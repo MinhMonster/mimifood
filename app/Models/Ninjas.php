@@ -17,6 +17,7 @@ class Ninjas extends Model
     protected $appends = ['active_discount'];
     protected $hidden = [
         'username',
+        'is_sold'
     ];
 
     protected $casts = [

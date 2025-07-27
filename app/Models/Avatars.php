@@ -26,7 +26,8 @@ class Avatars extends Model
         'land',
         'pets',
         'fish',
-        'sex'
+        'sex',
+        'is_sold'
     ];
 
     protected $casts = [

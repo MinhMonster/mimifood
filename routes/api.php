@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\NinjasController;
 use App\Http\Controllers\AvatarsController;
+use App\Http\Controllers\AccountPurchaseController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\NinjasController as AdminNinjasController;
@@ -30,7 +31,6 @@ use App\Http\Controllers\Admin\FileController;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [RegisterController::class, 'register']);
 
-
 Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
 Route::get('/products/{link}', [ProductsController::class, 'show'])->name('products.show');
 
@@ -41,6 +41,7 @@ Route::get('/avatars/{id}', [AvatarsController::class, 'show'])->name('avatars.s
 // user
 Route::group(['middleware' => 'is_user'], function () {
     Route::get('/user', [UserController::class, 'user'])->name('user');;
+    Route::post('/account-purchase', [AccountPurchaseController::class, 'purchase']);
 });
 
 // admin

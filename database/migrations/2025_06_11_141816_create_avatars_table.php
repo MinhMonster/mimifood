@@ -27,6 +27,7 @@ class CreateAvatarsTable extends Migration
             $table->integer('fish')->nullable();
             $table->integer('sex')->default(1);
             $table->text('description');
+            $table->boolean('is_sold')->default(false);
             $table->unsignedBigInteger('author_id')->default(1);
             $table->timestamps();
             $table->softDeletes();
