@@ -9,11 +9,13 @@ use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\NinjasController;
 use App\Http\Controllers\AvatarsController;
 use App\Http\Controllers\AccountPurchaseController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\NinjasController as AdminNinjasController;
 use App\Http\Controllers\Admin\AvatarsController as AdminAvatarsController;
 use App\Http\Controllers\Admin\DiscountsController as AdminDiscountsController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\FileController;
 
@@ -38,6 +40,9 @@ Route::get('/ninjas', [NinjasController::class, 'index'])->name('ninjas.index');
 Route::get('/ninjas/{id}', [NinjasController::class, 'show'])->name('ninjas.show');
 Route::get('/avatars', [AvatarsController::class, 'index'])->name('avatars.index');
 Route::get('/avatars/{id}', [AvatarsController::class, 'show'])->name('avatars.show');
+
+// settings
+Route::get('/notification', [SettingsController::class, 'notification'])->name('settings.notification');
 // user
 Route::group(['middleware' => 'is_user'], function () {
     Route::get('/user', [UserController::class, 'user'])->name('user');
@@ -80,4 +85,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
     Route::post('/discounts/destroy', [AdminDiscountsController::class, 'destroy'])->name('admin.discounts.destroy');
     Route::post('/discounts/restore', [AdminDiscountsController::class, 'restore'])->name('admin.discounts.restore');
     Route::get('/discounts/{id}', [AdminDiscountsController::class, 'show'])->name('admin.discounts.show');
+    // Admin Settings
+    Route::get('/settings', [AdminSettingsController::class, 'show'])->name('admin.settings.show');
+    Route::post('/settings/modify', [AdminSettingsController::class, 'modify'])->name('admin.settings.modify');
 });
