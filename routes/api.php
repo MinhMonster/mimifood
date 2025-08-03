@@ -10,12 +10,14 @@ use App\Http\Controllers\NinjasController;
 use App\Http\Controllers\AvatarsController;
 use App\Http\Controllers\AccountPurchaseController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\TopUpTransactionsController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\NinjasController as AdminNinjasController;
 use App\Http\Controllers\Admin\AvatarsController as AdminAvatarsController;
 use App\Http\Controllers\Admin\DiscountsController as AdminDiscountsController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Admin\TopUpTransactionsController as AdminTopUpTransactionsController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\FileController;
 
@@ -49,6 +51,10 @@ Route::group(['middleware' => 'is_user'], function () {
     Route::post('/account-purchase', [AccountPurchaseController::class, 'purchase']);
     Route::get('/account-purchase-histories', [AccountPurchaseController::class, 'index']);
     Route::get('/account-purchase-histories/{id}', [AccountPurchaseController::class, 'show']);
+    Route::prefix('top-up')->name('top-up.')->group(function () {
+        Route::post('/bank', [TopUpTransactionsController::class, 'store'])->name('bank.store');
+        Route::get('/bank/histories', [TopUpTransactionsController::class, 'index'])->name('bank.histories');
+    });
 });
 
 // admin
@@ -88,4 +94,6 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
     // Admin Settings
     Route::get('/settings', [AdminSettingsController::class, 'show'])->name('admin.settings.show');
     Route::post('/settings/modify', [AdminSettingsController::class, 'modify'])->name('admin.settings.modify');
+    Route::get('/top-up-transactions', [AdminTopUpTransactionsController::class, 'index'])->name('admin.topUpTransactions.index');
+    Route::post('/top-up-transactions/update', [AdminTopUpTransactionsController::class, 'update'])->name('admin.topUpTransactions.update');
 });

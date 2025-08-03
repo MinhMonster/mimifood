@@ -18,7 +18,9 @@ if (!function_exists('formatPaginate')) {
     function formatPaginate($query, $request)
     {
         $input = json_decode($request['input'] ?? '{}');
-        $pagination = $query->paginate($input->perPage ?? 30, ['*'], 'page', $input->page ?? 1);
+        $pagination = $query
+            ->orderBy('id', 'desc')
+            ->paginate($input->perPage ?? 30, ['*'], 'page', $input->page ?? 1);
         $response = [
             'response' => [
                 'count' => $pagination->total(),
