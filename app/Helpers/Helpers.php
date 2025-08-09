@@ -41,11 +41,11 @@ if (!function_exists('formatPaginate')) {
 }
 
 if (!function_exists('fetchData')) {
-    function fetchData($response)
+    function fetchData($response, $message = 'Successs')
     {
         $response = [
             'response' => $response,
-            'message' => 'Successs'
+            'message' => $message
         ];
 
         return response()->json($response);

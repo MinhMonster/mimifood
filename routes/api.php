@@ -12,6 +12,7 @@ use App\Http\Controllers\AccountPurchaseController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TopUpTransactionsController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\NinjasController as AdminNinjasController;
 use App\Http\Controllers\Admin\AvatarsController as AdminAvatarsController;
@@ -61,6 +62,8 @@ Route::group(['middleware' => 'is_user'], function () {
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
 // Route::post('/admin/register', [AdminAuthController::class, 'register']);
 Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
+    Route::get('/users', [AdminUserController::class, 'index'])->name('admin.users.index');
+    Route::post('/users/{user}/top-up', [AdminUserController::class, 'topUp'])->name('admin.users.topUp');
     Route::get('/products', [AdminProductsController::class, 'index'])->name('admin.products.index');
     Route::post('/products', [AdminProductsController::class, 'modify'])->name('admin.products.modify');
     Route::get('/products/{id}', [AdminProductsController::class, 'show'])->name('admin.products.show');
