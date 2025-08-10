@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\AvatarsController as AdminAvatarsController;
 use App\Http\Controllers\Admin\DiscountsController as AdminDiscountsController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\TopUpTransactionsController as AdminTopUpTransactionsController;
+use App\Http\Controllers\Admin\WalletTransactionController as AdminWalletTransactionController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\FileController;
 
@@ -99,4 +100,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
     Route::post('/settings/modify', [AdminSettingsController::class, 'modify'])->name('admin.settings.modify');
     Route::get('/top-up-transactions', [AdminTopUpTransactionsController::class, 'index'])->name('admin.topUpTransactions.index');
     Route::post('/top-up-transactions/update', [AdminTopUpTransactionsController::class, 'update'])->name('admin.topUpTransactions.update');
+
+    Route::prefix('wallet-transactions')
+        ->name('admin.wallet-transactions.')
+        ->controller(AdminWalletTransactionController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/{id}', 'show')->name('show');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+        });
 });
