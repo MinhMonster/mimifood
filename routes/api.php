@@ -11,6 +11,7 @@ use App\Http\Controllers\AvatarsController;
 use App\Http\Controllers\AccountPurchaseController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TopUpTransactionsController;
+use App\Http\Controllers\WalletTransactionController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
@@ -56,6 +57,9 @@ Route::group(['middleware' => 'is_user'], function () {
     Route::prefix('top-up')->name('top-up.')->group(function () {
         Route::post('/bank', [TopUpTransactionsController::class, 'store'])->name('bank.store');
         Route::get('/bank/histories', [TopUpTransactionsController::class, 'index'])->name('bank.histories');
+    });
+     Route::prefix('account')->name('top-up.')->group(function () {
+        Route::get('/transactions', [WalletTransactionController::class, 'index'])->name('account.transactions');
     });
 });
 

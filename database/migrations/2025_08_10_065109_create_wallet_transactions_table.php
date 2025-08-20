@@ -16,11 +16,12 @@ class CreateWalletTransactionsTable extends Migration
         Schema::create('wallet_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('type', ['increase', 'decrease']);
-            $table->decimal('amount', 15, );
-            $table->decimal('balance_before', 15);
-            $table->decimal('balance_after', 15);
-            $table->string('reference')->nullable();
+            $table->string('type');
+            $table->enum('direction', ['increase', 'decrease']);
+            $table->unsignedBigInteger('amount');
+            $table->unsignedBigInteger('balance_before');
+            $table->unsignedBigInteger('balance_after');
+            $table->json('meta')->nullable();
             $table->string('description')->nullable();
             $table->timestamps();
         });

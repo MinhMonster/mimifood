@@ -10,6 +10,7 @@ use \App\Models\User;
 use App\Models\Ninjas;
 use App\Models\Avatars;
 use App\Models\AccountPurchaseHistory;
+use App\Models\WalletTransaction;
 
 class AccountPurchaseController extends Controller
 {
@@ -50,6 +51,8 @@ class AccountPurchaseController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
+        $userId = $user->id;
+        $balanceBefore = $user->cash;
         $accountType = $request->input('account_type');
         $accountId = $request->input('account_id');
 
@@ -65,6 +68,7 @@ class AccountPurchaseController extends Controller
         }
 
         $account = $accountModel::lockForUpdate()->find($accountId);
+        $amount = $account->selling_price;
 
         if (!$account) {
             return response()->json(['message' => 'Account not found'], 404);
@@ -74,14 +78,14 @@ class AccountPurchaseController extends Controller
             return response()->json(['message' => 'Account already sold'], 409);
         }
 
-        if ($user->cash < $account->selling_price) {
+        if ($balanceBefore < $amount) {
             return response()->json(['message' => 'Số dư không đủ để mua tài khoản'], 402);
         }
 
         try {
             DB::beginTransaction();
             // update user
-            $user->cash -= $account->selling_price;
+            $user->cash -= $amount;
             $user->save();
 
             // update account
@@ -92,8 +96,21 @@ class AccountPurchaseController extends Controller
             $history = AccountPurchaseHistory::create([
                 'account_type' => $accountType,
                 'account_id' => $account->id,
-                'user_id' => $user->id,
-                'price' => $account->selling_price,
+                'user_id' => $userId,
+                'price' => $amount,
+            ]);
+
+            $transaction = config("transactions.types.purchase");
+
+            WalletTransaction::create([
+                'user_id'        => $userId,
+                'type'           => 'purchase',
+                'direction'      => $transaction['type'],
+                'amount'         => $amount,
+                'balance_before' => $balanceBefore,
+                'balance_after'  => $user->cash,
+                'reference'      => uniqid('TXN-'),
+                'description'    => $transaction['content'],
             ]);
 
             DB::commit();

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Admin\User;
-use App\Models\Admin\WalletTransaction;
+use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Admin\TopUpRequest;
 
@@ -23,36 +23,40 @@ class UserController extends Controller
         try {
             DB::beginTransaction();
             $balanceBefore = $user->cash;
-            $type = $request->type;
+            $direction = $request->type;
             $amount = $request->amount;
-            if ($type === 'increase') {
+            if ($direction === 'increase') {
                 $user->increment('cash', $amount);
+                $type = 'admin_adjust_increase';
             } else {
                 $user->decrement('cash', $amount);
+                $type = 'admin_adjust_decrease';
             }
+            $transaction = config("transactions.types.$type");
 
             WalletTransaction::create([
                 'user_id'        => $user->id,
                 'type'           => $type,
+                'direction'      => $direction,
                 'amount'         => $amount,
                 'balance_before' => $balanceBefore,
                 'balance_after'  => $user->cash,
                 'reference'      => uniqid('TXN-'),
-                'description'    => $validated['description'] ?? null,
+                'description'    => $transaction['content'],
             ]);
 
             DB::commit();
             return fetchData(
                 [
                     'cash' => $user->cash,
-                    'type' => $request->type
+                    'type' => $direction
                 ],
-                ucfirst($request->type) . ' successful'
+                $direction . ' successful'
             );
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => ucfirst($request->type) . ' failed',
+                'message' => $direction . ' failed',
                 'error' => $e->getMessage(),
             ], 500);
         }
