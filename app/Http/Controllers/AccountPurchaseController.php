@@ -109,8 +109,8 @@ class AccountPurchaseController extends Controller
                 'amount'         => $amount,
                 'balance_before' => $balanceBefore,
                 'balance_after'  => $user->cash,
-                'reference'      => uniqid('TXN-'),
                 'description'    => $transaction['content'],
+                'meta'           => $history
             ]);
 
             DB::commit();

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 class WalletTransaction extends Model
 {
     protected $casts = [
+        'meta' => 'array',
         'created_at'    => 'datetime:Y-m-d H:i:s',
         'updated_at'    => 'datetime:Y-m-d H:i:s',
     ];
@@ -18,6 +19,7 @@ class WalletTransaction extends Model
         'user_id',
         'direction',
         'type',
+        'meta',
         'amount',
         'balance_before',
         'balance_after',
@@ -46,5 +48,14 @@ class WalletTransaction extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getDescriptionAttribute()
+    {
+        if ($this->type === "purchase") {
+            return config("transactions.types.purchase.content");
+            // return $config['content'] . ": " . (is_array($this->meta) ? $this->meta['id'] ?? null : null);
+        }
+        return $this->attributes['description'];
     }
 }

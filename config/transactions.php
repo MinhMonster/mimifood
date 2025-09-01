@@ -19,12 +19,12 @@ return [
         'purchase' => [
             'label' => 'Thanh toán đơn hàng',
             'type'  => 'decrease',
-            'content' => 'Thanh toán cho đơn hàng #:order_id',
+            'content' => 'Thanh toán cho đơn hàng',
         ],
         'refund' => [
             'label' => 'Hoàn tiền',
             'type'  => 'increase',
-            'content' => 'Hoàn tiền cho đơn hàng #:order_id',
+            'content' => 'Hoàn tiền cho đơn hàng',
         ],
         'admin_adjust_increase' => [
             'label' => 'Điều chỉnh tăng',
