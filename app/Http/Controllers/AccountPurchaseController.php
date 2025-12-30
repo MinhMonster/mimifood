@@ -18,7 +18,7 @@ class AccountPurchaseController extends Controller
     {
         $user = Auth::user();
         $query = AccountPurchaseHistory::query()->where('user_id', $user->id);
-        return formatPaginate($query, $request);
+        return formatPaginate($query, $request, ['account']);
     }
 
     public function show(Request $request)

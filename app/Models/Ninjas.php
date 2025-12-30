@@ -7,17 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\HidesTimestamps;
+use App\Traits\Account\AccountRelations;
+use App\Traits\Account\AccountAttributes;
 
 class Ninjas extends Model
 {
     use HasFactory;
     use SoftDeletes;
     use HidesTimestamps;
+    use AccountRelations;
+    use AccountAttributes;
 
-    protected $appends = ['active_discount'];
+    protected $appends = ['active_discount', 'price', 'account_type'];
     protected $hidden = [
         'username',
-        'is_sold'
+        'is_sold',
+        'transfer_pin'
     ];
 
     protected $casts = [
@@ -79,18 +84,8 @@ class Ninjas extends Model
         });
     }
 
-    public function discount()
+    public function getAccountTypeAttribute()
     {
-        return Discounts::where('type', 'ninja')
-            ->where('is_active', true)
-            ->first();
-    }
-
-    public function getActiveDiscountAttribute()
-    {
-        return calculatePercentFromTiers(
-            $this->discount()->price_tiers ?? [],
-            $this->selling_price
-        );
+        return 'ninja';
     }
 }

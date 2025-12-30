@@ -24,6 +24,7 @@ class CreateNinjasTable extends Migration
             $table->decimal('selling_price', 10, 0)->nullable();
             $table->decimal('purchase_price', 10, 0)->nullable();
             $table->decimal('discount_percent', 5, 0)->nullable();
+            $table->string('transfer_pin', 255)->nullable();
             $table->text('description');
             $table->integer('class');
             $table->integer('level');

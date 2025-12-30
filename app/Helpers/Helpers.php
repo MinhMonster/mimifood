@@ -15,12 +15,17 @@ if (!function_exists('is_active')) {
 }
 
 if (!function_exists('formatPaginate')) {
-    function formatPaginate($query, $request)
+    function formatPaginate($query, $request, array $hidden = [])
     {
         $input = json_decode($request['input'] ?? '{}');
         $pagination = $query
             ->orderBy('id', 'desc')
             ->paginate($input->perPage ?? 30, ['*'], 'page', $input->page ?? 1);
+
+        if (!empty($hidden)) {
+            $pagination->getCollection()->each->makeHidden($hidden);
+        }
+
         $response = [
             'response' => [
                 'count' => $pagination->total(),
