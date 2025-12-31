@@ -20,7 +20,8 @@ class CreateNinjasTable extends Migration
             $table->string('password')->nullable();
             $table->string('character_name');
             $table->json('images');
-            $table->boolean('is_full_image');
+            $table->boolean('is_full_image')->default(true);;
+            $table->boolean('is_family')->default(false);;
             $table->decimal('selling_price', 10, 0)->nullable();
             $table->decimal('purchase_price', 10, 0)->nullable();
             $table->decimal('discount_percent', 5, 0)->nullable();
