@@ -13,9 +13,6 @@ class TopUpTransactions extends Model
 
     protected $fillable = [
         'user_id',
-        'account_number',
-        'account_holder_name',
-        'bank_name',
         'amount',
         'transaction_at',
         'status',
