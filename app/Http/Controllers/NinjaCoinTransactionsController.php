@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\NinjaCoinTransaction;
 use App\Models\NinjaCoinPrice;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class NinjaCoinTransactionsController extends Controller
 {
