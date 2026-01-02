@@ -27,6 +27,8 @@ class Ninjas extends Model
 
     protected $casts = [
         'images' => 'array',
+        'is_family' => 'boolean',
+        'is_full_image' => 'boolean',
     ];
 
     /**

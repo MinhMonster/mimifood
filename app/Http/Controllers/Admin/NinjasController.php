@@ -14,7 +14,7 @@ class NinjasController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Ninjas::query()->search($request);
+        $query = Ninjas::query()->search($request)->orderByDesc('code');
 
         return formatPaginate($query, $request);
     }
@@ -25,7 +25,12 @@ class NinjasController extends Controller
         $input = $request->input('input');
 
         $validator = Validator::make($input, [
-            'id' => 'nullable|integer',
+            'code' => [
+                'nullable',
+                'integer',
+                'min:1',
+                Rule::unique('ninjas', 'code')->ignore($oldId)->whereNull('deleted_at'),
+            ],
             'username' => [
                 'required',
                 'string',
@@ -40,28 +45,35 @@ class NinjasController extends Controller
             'purchase_price' => 'required|integer',
             'discount_percent' => 'nullable|integer|max:50',
             'class' => 'required|integer',
-            'level' => 'required|integer|max:130',
+            'level' => 'required|integer|max:160',
             'server' => 'required|integer',
             'weapon' => 'required|integer|max:16',
             'type' => ['required', Rule::in(['1', '2', '3'])],
-            'tl1' => 'nullable|integer|max:9',
-            'tl2' => 'nullable|integer|max:9',
-            'tl3' => 'nullable|integer|max:9',
-            'tl4' => 'nullable|integer|max:9',
-            'tl5' => 'nullable|integer|max:9',
-            'tl6' => 'nullable|integer|max:9',
-            'tl7' => 'nullable|integer|max:9',
-            'tl8' => 'nullable|integer|max:9',
-            'tl9' => 'nullable|integer|max:9',
-            'tl10' => 'nullable|integer|max:9',
-            'yoroi' => 'nullable|integer|max:9',
-            'eye' => 'nullable|integer|max:6',
-            'book' => 'nullable|integer|max:11',
-            'cake' => 'nullable|integer|max:20',
-            'yen' => 'nullable|string',
-            'clone' => 'nullable|string',
-            'disguise' => 'nullable|string',
-            'mounts' => 'nullable|string',
+            'tl_1' => 'nullable|integer|max:9',
+            'tl_2' => 'nullable|integer|max:9',
+            'tl_3' => 'nullable|integer|max:9',
+            'tl_4' => 'nullable|integer|max:9',
+            'tl_5' => 'nullable|integer|max:9',
+            'tl_6' => 'nullable|integer|max:9',
+            'tl_7' => 'nullable|integer|max:9',
+            'tl_8' => 'nullable|integer|max:9',
+            'tl_9' => 'nullable|integer|max:9',
+            'tl_10' => 'nullable|integer|max:9',
+            'tl_11' => 'nullable|integer|max:9',
+            'tl_12' => 'nullable|integer|max:9',
+            'item_1' => 'nullable|string',
+            'item_2' => 'nullable|string',
+            'item_3' => 'nullable|string',
+            'item_4' => 'nullable|string',
+            'item_5' => 'nullable|string',
+            'item_6' => 'nullable|string',
+            'item_7' => 'nullable|string',
+            'item_8' => 'nullable|string',
+            'item_9' => 'nullable|string',
+            'item_10' => 'nullable|string',
+            'item_11' => 'nullable|string',
+            'item_12' => 'nullable|string',
+            'item_13' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -74,6 +86,9 @@ class NinjasController extends Controller
 
         $validated = $validator->validated();
 
+        if (empty($validated['code'])) {
+            $validated['code'] = (Ninjas::max('code') ?? 0) + 1;
+        }
         if (!$oldId) {
             $ninja = new Ninjas();
             if (!empty($validated['id'])) {
@@ -92,19 +107,19 @@ class NinjasController extends Controller
             ], 404);
         }
 
-        if (!empty($validated['id']) && $validated['id'] != $oldId) {
-            DB::transaction(function () use ($oldNinja, $validated) {
-                $newNinja = new Ninjas();
-                $newNinja->id = $validated['id'];
-                $newNinja->fill($validated);
-                $newNinja->save();
+        // if (!empty($validated['id']) && $validated['id'] != $oldId) {
+        //     DB::transaction(function () use ($oldNinja, $validated) {
+        //         $newNinja = new Ninjas();
+        //         $newNinja->id = $validated['id'];
+        //         $newNinja->fill($validated);
+        //         $newNinja->save();
 
-                $oldNinja->delete();
-            });
+        //         $oldNinja->delete();
+        //     });
 
-            $ninja = Ninjas::find($validated['id']);
-            return fetchData($ninja);
-        }
+        //     $ninja = Ninjas::find($validated['id']);
+        //     return fetchData($ninja);
+        // }
 
         $oldNinja->fill($validated)->save();
         return fetchData($oldNinja);

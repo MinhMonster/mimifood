@@ -15,7 +15,7 @@ class CreateNinjasTable extends Migration
     {
         Schema::create('ninjas', function (Blueprint $table) {
             $table->id();
-
+            $table->integer('code')->unique();
             $table->string('username');
             $table->string('password')->nullable();
             $table->string('character_name');
@@ -26,25 +26,22 @@ class CreateNinjasTable extends Migration
             $table->decimal('purchase_price', 10, 0)->nullable();
             $table->decimal('discount_percent', 5, 0)->nullable();
             $table->string('transfer_pin', 255)->nullable();
-            $table->text('description');
             $table->integer('class');
             $table->integer('level');
             $table->integer('server');
-            $table->integer('type');
             $table->integer('weapon');
-            for ($i = 1; $i <= 10; $i++) {
-                $table->integer("tl{$i}")->nullable();
-            }
-            $table->integer('yoroi')->nullable();
-            $table->integer('eye')->nullable();
-            $table->integer('book')->nullable();
-            $table->integer('cake')->nullable();
-            $table->text('clone')->nullable();
-            $table->text('yen')->nullable();
-            $table->text('disguise')->nullable();
-            $table->text('mounts')->nullable();
+            $table->integer('type');
+            $table->text('description');
             $table->boolean('is_sold')->default(false);
             $table->unsignedBigInteger('author_id')->default(1);
+
+            for ($i = 1; $i <= 12; $i++) {
+                $table->integer("tl_{$i}")->nullable();
+            }
+
+            for ($i = 1; $i <= 13; $i++) {
+                $table->string("item_{$i}")->nullable();
+            }
 
             $table->timestamps();
             $table->softDeletes();

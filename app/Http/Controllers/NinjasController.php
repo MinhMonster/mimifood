@@ -11,7 +11,7 @@ class NinjasController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Ninjas::query()->search($request);
+        $query = Ninjas::query()->search($request)->orderByDesc('code');
         return formatPaginate($query, $request);
     }
 
