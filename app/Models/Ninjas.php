@@ -20,6 +20,7 @@ class Ninjas extends Model
 
     protected $appends = ['active_discount', 'price', 'account_type'];
     protected $hidden = [
+        'id',
         'username',
         'is_sold',
         'transfer_pin'
@@ -41,47 +42,67 @@ class Ninjas extends Model
     public function scopeSearch($query, Request $request)
     {
         $input = json_decode($request->input('input', '{}'));
-        $search = $input->q;
+        $search = $input->q ?? null;
         // return $search;
         if (empty($search)) {
             return $query;
         }
 
         return $query->where(function ($q) use ($search) {
-            if (!empty($search->id)) {
-                $q->orWhere('id', $search->id);
+            if (!empty($search->code)) {
+                $q->where('code', $search->code);
             }
 
             if (!empty($search->type)) {
                 switch ($search->type) {
                     case "VIP":
-                        $q->orWhere('type', 1);
+                        $q->where('type', 1);
                         break;
                     case "cheap":
-                        $q->orWhere('type', 2);
+                        $q->where('type', 2);
                         break;
                     default:
                 }
             }
 
             if (!empty($search->level)) {
-                $q->orWhere('level', 'like', "%{$search->level}%");
+                if (isset($search->level->min)) {
+                    $q->where('level', '>=', $search->level->min);
+                }
+
+                if (isset($search->level->max)) {
+                    $q->where('level', '<=', $search->level->max);
+                }
+            }
+
+            if (!empty($search->cash)) {
+                if (isset($search->cash->min)) {
+                    $q->where('selling_price', '>=', $search->cash->min);
+                }
+
+                if (isset($search->cash->max)) {
+                    $q->where('selling_price', '<=', $search->cash->max);
+                }
             }
 
             if (!empty($search->class)) {
-                $q->orWhere('class', 'like', "%{$search->class}%");
+                $q->where('class', 'like', "%{$search->class}%");
             }
 
             if (!empty($search->server)) {
-                $q->orWhere('server', 'like', "%{$search->server}%");
+                $q->where('server', 'like', "%{$search->server}%");
             }
 
             if (!empty($search->username)) {
-                $q->orWhere('username', 'like', "%{$search->username}%");
+                $q->where('username', 'like', "%{$search->username}%");
             }
 
             if (!empty($search->ingame)) {
-                $q->orWhere('character_name', 'like', "%{$search->ingame}%");
+                $q->where('character_name', 'like', "%{$search->ingame}%");
+            }
+
+            if (!empty($search->family)) {
+                $q->where('is_family', $search->family);
             }
         });
     }

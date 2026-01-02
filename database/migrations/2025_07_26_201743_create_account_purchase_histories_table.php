@@ -11,7 +11,7 @@ class CreateAccountPurchaseHistoriesTable extends Migration
         Schema::create('account_purchase_histories', function (Blueprint $table) {
             $table->id();
             $table->string('account_type');
-            $table->unsignedBigInteger('account_id');
+            $table->unsignedBigInteger('account_code');
             $table->unsignedBigInteger('user_id');
             $table->decimal('price', 10, 0);
             $table->text('note')->nullable();

@@ -11,17 +11,17 @@ class NinjasController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Ninjas::query()->search($request)->orderByDesc('code');
+        $query = Ninjas::where('is_sold', false)->orderByDesc('code')->search($request);
         return formatPaginate($query, $request);
     }
 
-    public function show($id)
+    public function show($code)
     {
-        $ninja = Ninjas::find($id);
+        $ninja = Ninjas::where('code', $code)->where('is_sold', false)->first();
         if (!$ninja) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Ninja not found',
+                'message' => 'Tài khoản không tồn tại hoặc đã bán!',
             ], 404);
         }
 

@@ -19,7 +19,7 @@ class AccountPurchaseHistory extends Model
     ];
     protected $fillable = [
         'account_type',
-        'account_id',
+        'account_code',
         'user_id',
         'price',
         'note',
@@ -32,22 +32,22 @@ class AccountPurchaseHistory extends Model
 
     public function getAccountAttribute()
     {
-        if (!$this->account_type || !$this->account_id) {
+        if (!$this->account_type || !$this->account_code) {
             return null;
         }
 
         switch ($this->account_type) {
             case 'ninja':
                 $account = Ninjas::query()
-                    ->select('id', 'character_name', 'username', 'password', 'transfer_pin')
-                    ->find($this->account_id);
+                    ->select('code', 'character_name', 'username', 'password', 'transfer_pin')
+                    ->where('code', $this->account_code)->first();
 
                 if (!$account) {
                     return null;
                 }
 
                 return [
-                    'id' => $account->id,
+                    'code' => $account->code,
                     'character_name' => $account->character_name,
                     'username' => $account->username,
                     'password' => $account->password,
@@ -56,15 +56,15 @@ class AccountPurchaseHistory extends Model
 
             case 'avatar':
                 $account = Avatars::query()
-                    ->select('id', 'username', 'password', 'transfer_pin')
-                    ->find($this->account_id);
+                    ->select('code', 'username', 'password', 'transfer_pin')
+                    ->where('code', $this->account_code)->first();
 
                 if (!$account) {
                     return null;
                 }
 
                 return [
-                    'id' => $account->id,
+                    'code' => $account->code,
                     'username' => $account->username,
                     'password' => $account->password,
                     'transfer_pin' => $account->transfer_pin,

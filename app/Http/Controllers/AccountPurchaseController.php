@@ -42,7 +42,7 @@ class AccountPurchaseController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'account_type' => 'required|in:ninja,avatar,ngocrong',
-            'account_id' => 'required|integer',
+            'account_code' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
@@ -54,7 +54,7 @@ class AccountPurchaseController extends Controller
         $userId = $user->id;
         $balanceBefore = $user->cash;
         $accountType = $request->input('account_type');
-        $accountId = $request->input('account_id');
+        $accountCode = $request->input('account_code');
 
         switch ($accountType) {
             case 'ninja':
@@ -64,28 +64,28 @@ class AccountPurchaseController extends Controller
                 $accountModel = Avatars::class;
                 break;
             default:
-                return response()->json(['message' => 'Invalid game type'], 400);
+                return response()->json(['message' => 'Loại game không tồn tại!'], 400);
         }
 
-        $account = $accountModel::lockForUpdate()->find($accountId);
-        $amount = $account->selling_price;
+        $account = $accountModel::lockForUpdate()->where('code', $accountCode)->first();
+        $price = $account->price;
 
         if (!$account) {
-            return response()->json(['message' => 'Account not found'], 404);
+            return response()->json(['message' => 'Không tìm thấy tài khoản này!'], 404);
         }
 
         if ($account->is_sold ?? false) {
-            return response()->json(['message' => 'Account already sold'], 409);
+            return response()->json(['message' => 'Tài khoản này đã bán!'], 409);
         }
 
-        if ($balanceBefore < $amount) {
-            return response()->json(['message' => 'Số dư không đủ để mua tài khoản'], 402);
+        if ($balanceBefore < $price) {
+            return response()->json(['message' => 'Số dư không đủ để mua tài khoản!'], 402);
         }
 
         try {
             DB::beginTransaction();
             // update user
-            $user->cash -= $amount;
+            $user->cash -= $price;
             $user->save();
 
             // update account
@@ -95,9 +95,9 @@ class AccountPurchaseController extends Controller
             // create history buy account
             $history = AccountPurchaseHistory::create([
                 'account_type' => $accountType,
-                'account_id' => $account->id,
+                'account_code' => $account->code,
                 'user_id' => $userId,
-                'price' => $amount,
+                'price' => $price,
             ]);
 
             $transaction = config("transactions.types.purchase");
@@ -106,7 +106,7 @@ class AccountPurchaseController extends Controller
                 'user_id'        => $userId,
                 'type'           => 'purchase',
                 'direction'      => $transaction['type'],
-                'amount'         => $amount,
+                'amount'         => $price,
                 'balance_before' => $balanceBefore,
                 'balance_after'  => $user->cash,
                 'description'    => $transaction['content'],
