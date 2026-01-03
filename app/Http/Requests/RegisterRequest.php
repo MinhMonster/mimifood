@@ -19,23 +19,6 @@ class RegisterRequest extends FormRequest
         return true;
     }
 
-
-    /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array
-     */
-    public function attributes(): array
-    {
-        return [
-            'name'     => 'name',
-            'email'    => 'email',
-            'password' => 'password',
-            'password_confirmation' => 'password_confirmation',
-            'phone' => 'phone'
-        ];
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -46,29 +29,13 @@ class RegisterRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'password_confirmation' => 'required',
+            'password' => 'required|string|min:8',
+            'password_confirmation' => 'required|same:password',
             'phone' => [
                 'required',
                 'regex:/^(0|\+84)[0-9]{9}$/',
                 'unique:users',
             ],
-        ];
-    }
-
-    /**
-     *
-     *
-     * @return array
-     */
-    public function messages()
-    {
-        return [
-            'name' => 'Tên hiển thị',
-            'email' => 'Email',
-            'password' => 'Mật khẩu',
-            'password_confirmation' => 'Mật khẩu nhập lại',
-            'phone' => 'Số điện thoại',
         ];
     }
 

@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Requests;
+
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
@@ -18,19 +20,6 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array
-     */
-    public function attributes(): array
-    {
-        return [
-            'email'    => 'email',
-            'password' => 'password',
-        ];
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array
@@ -41,16 +30,6 @@ class LoginRequest extends FormRequest
             'email' => 'required|string|email',
             'password' => 'required|string',
         ];
-    }
-
-    /**
-     *
-     *
-     * @return array
-     */
-    public function messages()
-    {
-        return [];
     }
 
     /**
