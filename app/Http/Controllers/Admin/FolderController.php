@@ -28,7 +28,7 @@ class FolderController extends Controller
         ]);
 
         $parent = Folder::find($request->parent_id);
-        $path = ($parent->path ?? 'images') . '/' . $request->name;
+        $path = ($parent->path ?? '/images') . '/' . $request->name;
 
         $disk = Storage::disk('main_domain');
 
@@ -77,7 +77,7 @@ class FolderController extends Controller
         $parent = Folder::find($folder->parent_id);
 
         $oldPath = $folder->path;
-        $newPath = ($parent->path ?? 'images') . '/' . $request->name;
+        $newPath = ($parent->path ?? '/images') . '/' . $request->name;
 
         if ($oldPath === $newPath) {
             $folder->update(['name' => $request->name]);
