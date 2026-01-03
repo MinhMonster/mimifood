@@ -20,6 +20,13 @@ class FolderController extends Controller
         return formatPaginate($folders, $request);
     }
 
+    public function buildPath(?string $parentPath, string $name): string
+    {
+        $base = $parentPath ?? '/images/';
+        return rtrim($base, '/') . '/' . trim($name, '/') . '/';
+    }
+
+
     public function create(Request $request)
     {
         $request->validate([
@@ -28,7 +35,10 @@ class FolderController extends Controller
         ]);
 
         $parent = Folder::find($request->parent_id);
-        $path = ($parent->path ?? '/images') . '/' . $request->name;
+        $path = $this->buildPath(
+            $parent ? $parent->path : null,
+            $request->name
+        );
 
         $disk = Storage::disk('main_domain');
 
@@ -57,8 +67,8 @@ class FolderController extends Controller
 
         Folder::create([
             'parent_id' => $request->parent_id,
-            'name'      => $request->name,
-            'path'      => $path,
+            'name' => $request->name,
+            'path' => $path,
         ]);
 
         return response()->json([
@@ -77,7 +87,10 @@ class FolderController extends Controller
         $parent = Folder::find($folder->parent_id);
 
         $oldPath = $folder->path;
-        $newPath = ($parent->path ?? '/images') . '/' . $request->name;
+        $newPath = $this->buildPath(
+            $parent ? $parent->path : null,
+            $request->name
+        );
 
         if ($oldPath === $newPath) {
             $folder->update(['name' => $request->name]);
