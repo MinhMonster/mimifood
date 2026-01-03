@@ -15,10 +15,16 @@ class Folder extends Model
      * @var array
      */
     protected $fillable = [
-        'id', 'name', 'parent_id', 'admin_id','created_at', 'updated_at'
+        'id',
+        'path',
+        'name',
+        'parent_id',
+        'admin_id',
+        'created_at',
+        'updated_at'
     ];
 
-    protected $appends = ['sub_folders', 'path', "parent_path"];
+    protected $appends = ['sub_folders', "parent_path"];
 
     /**
      *
@@ -63,12 +69,12 @@ class Folder extends Model
         return $parentPath;
     }
 
-    public function getPathAttribute()
-    {
+    // public function getPathAttribute()
+    // {
 
-        $full_path = $this->parent_path . $this->name . "/";
-        return $full_path;
-    }
+    //     $full_path = $this->parent_path . $this->name . "/";
+    //     return $full_path;
+    // }
 
 
 }
