@@ -51,10 +51,11 @@ return [
     | your application so that it is used when running Artisan tasks.
     |
     */
-    'base_url' => env('BASE_URL', 'https://api.mimifood.vn'),
-    'url' => env('APP_URL', 'http://localhost'),
+    'base_url' => env('BASE_URL', 'http://localhost:8008'),
+    'url' => env('APP_URL', 'http://localhost:8008'),
 
-    'asset_url' => env('ASSET_URL', null),
+    'asset_url' => env('ASSET_URL', 'http://localhost:8008/storage/'),
+    'main_domain_asset_url' => env('MAIN_DOMAIN_ASSET_URL', 'http://localhost:8008/storage/'),
 
     /*
     |--------------------------------------------------------------------------

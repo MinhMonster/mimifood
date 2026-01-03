@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,7 +15,7 @@ class File extends Model
     protected $fillable = [
         'id',
         'name',
-        'path',
+        'disk',
         'size',
         'mime_type',
         'folder_id',
@@ -23,12 +24,13 @@ class File extends Model
         'updated_at'
     ];
 
-    protected $appends = ['byteSize', 'fileName', "url"];
+    protected $appends = ['byteSize', 'path', 'fileName', "url"];
     protected $hidden = [
         'created_at',
         'updated_at',
         'deleted_at',
         'name',
+        'folder',
         'admin_id',
         'mime_type',
         'path',
@@ -36,15 +38,15 @@ class File extends Model
         'folder_id'
     ];
 
-    public function getFolderPathAttribute()
+    // File thuộc về một Folder
+    public function folder(): BelongsTo
     {
-        if ($this->folder_id) {
-            return Folder::find($this->folder_id)->path;
-            // return $folder->path;
-            // return $this->belongsTo(Folder::class, 'folder_id')->firts()->path;
-        }
+        return $this->belongsTo(Folder::class);
+    }
 
-        return "/images/";
+    public function getFolderPathAttribute(): string
+    {
+        return buildFolderPath($this->folder ? $this->folder->path : null);
     }
 
     public function getByteSizeAttribute()
@@ -57,17 +59,26 @@ class File extends Model
         return $this->name;
     }
 
+    // Accessor: trả về full path trên disk
+    public function getPathAttribute(): string
+    {
+        return $this->folder_path . $this->name;
+    }
+
     public function getUrlAttribute()
     {
-        return config('app.base_url') . "/storage" . $this->folder_path . $this->name;
+        $disk = $this->disk ?? 'public';
+        if ($disk === 'public') {
+            $assetUrl = config('app.asset_url');
+        } else {
+            $assetUrl = config('app.main_domain_asset_url');
+        }
+        return $assetUrl . $this->path;
     }
 
     public function delete()
     {
-        // Xóa file thực tế trên server (nếu cần)
         Storage::delete($this->path);
-
-        // Gọi phương thức delete mặc định để đánh dấu bản ghi là đã xóa
         return parent::delete();
     }
 }

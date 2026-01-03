@@ -69,3 +69,21 @@ if (!function_exists('calculatePercentFromTiers')) {
         return end($priceTiers)['value'] ?? 0;
     }
 }
+
+if (! function_exists('buildFolderPath')) {
+    /**
+     * @param string|null $parentPath
+     * @param string $folderName
+     * @return string
+     */
+    function buildFolderPath(?string $parentPath, string $folderName = ''): string
+    {
+        $parentPath = $parentPath ?? config('filesystems.default_folder');
+        $parentPath = trim($parentPath, '/') . '/';
+        $folderName = trim($folderName, '/');
+        $fullPath = $folderName !== '' ? $parentPath . $folderName . '/' : $parentPath;
+        $fullPath = preg_replace('#/+#', '/', $fullPath);
+
+        return $fullPath;
+    }
+}

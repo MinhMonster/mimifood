@@ -16,6 +16,7 @@ class CreateFoldersTable extends Migration
         Schema::create('folders', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('path')->nullable();
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->foreign('parent_id')->references('id')->on('folders')->onDelete('cascade');
             $table->unsignedBigInteger('admin_id')->nullable()->default('1');

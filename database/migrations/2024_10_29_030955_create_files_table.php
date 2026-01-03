@@ -16,11 +16,11 @@ class CreateFilesTable extends Migration
         Schema::create('files', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('path');
             $table->bigInteger('size');
             $table->string('mime_type');
             $table->unsignedBigInteger('folder_id')->nullable();;
             $table->foreign('folder_id')->references('id')->on('folders')->onDelete('cascade');
+            $table->string('disk')->default('public');
             $table->unsignedBigInteger('admin_id')->nullable()->default('1');
             $table->foreign('admin_id')->references('id')->on('admins');
             // $table->foreignId('admin_id')->nullable()->default(1)->constrained('admins');
