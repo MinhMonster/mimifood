@@ -11,14 +11,14 @@ class AvatarsController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Avatars::query()->search($request);
+        $query = Avatars::where('is_sold', false)->orderByDesc('code')->search($request);
 
         return formatPaginate($query, $request);
     }
 
-    public function show(Request $request)
+    public function show($code)
     {
-        $avatar = Avatars::find($request->id);
+        $avatar = Avatars::where('code', $code)->where('is_sold', false)->first();
 
         if (!$avatar) {
             return response()->json([

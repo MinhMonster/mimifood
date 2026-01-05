@@ -15,6 +15,7 @@ class CreateAvatarsTable extends Migration
     {
         Schema::create('avatars', function (Blueprint $table) {
             $table->id();
+            $table->integer('code')->unique();
             $table->string('username');
             $table->string('password')->nullable();
             $table->json('images');

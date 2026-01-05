@@ -60,12 +60,12 @@ class Avatars extends Model
         }
 
         return $query->where(function ($q) use ($search) {
-            if (isset($search->id) && ctype_digit((string) $search->id)) {
-                $q->orWhere('id', $search->id);
+            if (!empty($search->code)) {
+                $q->where('code', $search->code);
             }
 
             if (!empty($search->username)) {
-                $q->orWhere('username', 'like', "%{$search->username}%");
+                $q->where('username', 'like', "%{$search->username}%");
             }
         });
     }

@@ -15,6 +15,7 @@ class Avatars extends Model
     protected $appends = ['active_discount'];
 
     protected $fillable = [
+        'code',
         'username',
         'description',
         'images',
@@ -58,6 +59,14 @@ class Avatars extends Model
         return $query->where(function ($q) use ($input) {
             if (isset($input->id) && ctype_digit((string) $input->id)) {
                 $q->orWhere('id', $input->id);
+            }
+
+            if (!empty($input->code)) {
+                $q->orWhere('code', $input->code);
+            }
+
+            if (!empty($input->sex)) {
+                $q->orWhere('sex', $input->sex);
             }
 
             if (!empty($input->username)) {

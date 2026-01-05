@@ -14,7 +14,7 @@ class AvatarsController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Avatars::query()->search($request);
+        $query = Avatars::query()->search($request)->orderByDesc('code');
 
         return formatPaginate($query, $request);
     }
@@ -25,7 +25,12 @@ class AvatarsController extends Controller
         $input = $request->input('input');
 
         $validator = Validator::make($input, [
-            'id' => 'nullable|integer',
+            'code' => [
+                'nullable',
+                'integer',
+                'min:1',
+                Rule::unique('ninjas', 'code')->ignore($oldId)->whereNull('deleted_at'),
+            ],
             'username' => [
                 'required',
                 'string',
@@ -54,6 +59,10 @@ class AvatarsController extends Controller
 
         $validated = $validator->validated();
 
+        if (empty($validated['code'])) {
+            $validated['code'] = (Avatars::max('code') ?? 0) + 1;
+        }
+
         if (!$oldId) {
             $avatar = new Avatars();
             if (!empty($validated['id'])) {
@@ -72,19 +81,19 @@ class AvatarsController extends Controller
             ], 404);
         }
 
-        if (!empty($validated['id']) && $validated['id'] != $oldId) {
-            DB::transaction(function () use ($oldAvatar, $validated) {
-                $newAvatar = new Avatars();
-                $newAvatar->id = $validated['id'];
-                $newAvatar->fill($validated);
-                $newAvatar->save();
+        // if (!empty($validated['id']) && $validated['id'] != $oldId) {
+        //     DB::transaction(function () use ($oldAvatar, $validated) {
+        //         $newAvatar = new Avatars();
+        //         $newAvatar->id = $validated['id'];
+        //         $newAvatar->fill($validated);
+        //         $newAvatar->save();
 
-                $oldAvatar->delete();
-            });
+        //         $oldAvatar->delete();
+        //     });
 
-            $avatar = Avatars::find($validated['id']);
-            return fetchData($avatar);
-        }
+        //     $avatar = Avatars::find($validated['id']);
+        //     return fetchData($avatar);
+        // }
 
         $oldAvatar->fill($validated)->save();
         return fetchData($oldAvatar);

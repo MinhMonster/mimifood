@@ -92,6 +92,10 @@ class Ninjas extends Model
                 $q->orWhere('id', $input->id);
             }
 
+            if (!empty($input->code)) {
+                $q->orWhere('code', $input->code);
+            }
+
             if (!empty($input->username)) {
                 $q->orWhere('username', 'like', "%{$input->username}%");
             }

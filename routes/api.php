@@ -46,7 +46,7 @@ Route::get('/products/{link}', [ProductsController::class, 'show'])->name('produ
 Route::get('/ninjas', [NinjasController::class, 'index'])->name('ninjas.index');
 Route::get('/ninjas/{code}', [NinjasController::class, 'show'])->name('ninjas.show');
 Route::get('/avatars', [AvatarsController::class, 'index'])->name('avatars.index');
-Route::get('/avatars/{id}', [AvatarsController::class, 'show'])->name('avatars.show');
+Route::get('/avatars/{code}', [AvatarsController::class, 'show'])->name('avatars.show');
 Route::get('/ninja-coin/prices', [NinjaCoinTransactionsController::class, 'prices'])
     ->name('ninja-coin.prices');
 Route::get('/carrot/prices', [CarrotTransactionsController::class, 'prices'])
