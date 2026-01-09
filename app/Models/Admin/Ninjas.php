@@ -17,6 +17,7 @@ class Ninjas extends Model
         'username',
         'password',
         'character_name',
+        'transfer_pin',
         'description',
         'images',
         'is_full_image',

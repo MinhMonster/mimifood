@@ -16,13 +16,22 @@ class AccountPurchaseHistory extends Model
     protected $appends = ['purchased_at', 'account'];
     protected $hidden = [
         'user_id',
+        'images',
+        'note',
+        'purchase_price'
     ];
     protected $fillable = [
         'account_type',
         'account_code',
         'user_id',
-        'price',
+        'selling_price',
+        'purchase_price',
+        'images',
         'note',
+    ];
+
+    protected $casts = [
+        'images' => 'array',
     ];
 
     public function getPurchasedAtAttribute()
@@ -73,5 +82,10 @@ class AccountPurchaseHistory extends Model
             default:
                 return null;
         }
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

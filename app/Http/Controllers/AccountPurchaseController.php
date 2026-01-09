@@ -97,7 +97,8 @@ class AccountPurchaseController extends Controller
                 'account_type' => $accountType,
                 'account_code' => $account->code,
                 'user_id' => $userId,
-                'price' => $price,
+                'selling_price' => $price,
+                'purchase_price' => $account->purchase_price,
             ]);
 
             $transaction = config("transactions.types.purchase");

@@ -17,6 +17,8 @@ class Avatars extends Model
     protected $fillable = [
         'code',
         'username',
+        'password',
+        'transfer_pin',
         'description',
         'images',
         'is_full_image',

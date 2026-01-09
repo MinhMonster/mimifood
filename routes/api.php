@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\DiscountsController as AdminDiscountsController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\TopUpTransactionsController as AdminTopUpTransactionsController;
 use App\Http\Controllers\Admin\WalletTransactionController as AdminWalletTransactionController;
+use App\Http\Controllers\Admin\AccountPurchaseController as AdminAccountPurchaseHistoryController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\FileController;
 
@@ -122,6 +123,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
     Route::post('/settings/modify', [AdminSettingsController::class, 'modify'])->name('admin.settings.modify');
     Route::get('/top-up-transactions', [AdminTopUpTransactionsController::class, 'index'])->name('admin.topUpTransactions.index');
     Route::post('/top-up-transactions/update', [AdminTopUpTransactionsController::class, 'update'])->name('admin.topUpTransactions.update');
+    Route::prefix('account-purchase-histories')->name('admin.accountPurchaseHistories.')->group(function () {
+        Route::get('/', [AdminAccountPurchaseHistoryController::class, 'index'])->name('index');
+        Route::post('/{id}/update', [AdminAccountPurchaseHistoryController::class, 'update'])->name('update');
+        Route::post('/{id}/update-account', [AdminAccountPurchaseHistoryController::class, 'updateAccount'])->name('updateAccount');
+    });
 
     Route::prefix('wallet-transactions')
         ->name('admin.wallet-transactions.')

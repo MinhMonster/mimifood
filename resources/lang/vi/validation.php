@@ -139,5 +139,8 @@ return [
         'password_confirmation' => 'Mật khẩu xác nhận',
         'name' => 'Tên hiển thị',
         'phone' => 'Số điện thoại',
+        'selling_price' => 'Giá bán',
+        'purchase_price' => 'Giá nhập',
+        'transfer_pin' => 'Mã pin',
     ],
 ];
