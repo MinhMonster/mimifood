@@ -6,11 +6,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use \App\Models\User;
+use Illuminate\Support\Facades\Log;
+use App\Models\User;
 use App\Models\Ninjas;
 use App\Models\Avatars;
 use App\Models\AccountPurchaseHistory;
 use App\Models\WalletTransaction;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AdminPurchaseNotification;
 
 class AccountPurchaseController extends Controller
 {
@@ -115,6 +118,17 @@ class AccountPurchaseController extends Controller
             ]);
 
             DB::commit();
+
+            try {
+                Mail::to(config('mail.admin_email'))
+                    ->queue(new AdminPurchaseNotification($user, $account, $history));
+            } catch (\Throwable $e) {
+                Log::error('Send admin purchase mail failed', [
+                    'user_id' => $user->id,
+                    'account_code' => $history->account_code,
+                    'error' => $e->getMessage(),
+                ]);
+            }
 
             return response()->json([
                 'message' => 'Mua tài khoản thành công',
