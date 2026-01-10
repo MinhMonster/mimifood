@@ -34,10 +34,6 @@ class AdminAccountPurchaseHistory extends AccountPurchaseHistory
         'created_at',
     ];
 
-    protected $casts = [
-        'images' => 'array',
-    ];
-
     /**
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query

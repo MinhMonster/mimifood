@@ -34,6 +34,10 @@ class AccountPurchaseHistory extends Model
         'images' => 'array',
     ];
 
+    protected $attributes = [
+        'images' => '[]',
+    ];
+
     public function getPurchasedAtAttribute()
     {
         return $this->created_at->format('d-m-Y - H:i:s');

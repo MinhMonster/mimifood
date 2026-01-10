@@ -12,7 +12,7 @@ class CreateAccountPurchaseHistoriesTable extends Migration
             $table->id();
             $table->string('account_type');
             $table->unsignedBigInteger('account_code');
-            $table->json('images');
+            $table->json('images')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->decimal('selling_price', 10, 0);
             $table->decimal('purchase_price', 10, 0);
