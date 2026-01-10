@@ -22,6 +22,7 @@ class NinjasController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Tài khoản không tồn tại hoặc đã bán!',
+                'account_type' => 'ninja',
             ], 404);
         }
 

@@ -23,7 +23,8 @@ class AvatarsController extends Controller
         if (!$avatar) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Avatar not found',
+                'message' => 'Tài khoản không tồn tại hoặc đã bán!',
+                'account_type' => 'avatar',
             ], 404);
         }
 
