@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Admin\Ninjas; // Import model
 use App\Http\Controllers\Controller;
+use App\Support\SumConfig;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\DB;
-
 use Illuminate\Http\Request;
 
 class NinjasController extends Controller
@@ -16,7 +15,12 @@ class NinjasController extends Controller
     {
         $query = Ninjas::query()->search($request)->orderByDesc('code');
 
-        return formatPaginate($query, $request);
+        return formatPaginate(
+            $query,
+            $request,
+            [],
+            SumConfig::account_game()
+        );
     }
 
     public function modify(Request $request)

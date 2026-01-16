@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin\AdminAccountPurchaseHistory;
+use App\Support\SumConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,7 +14,12 @@ class AccountPurchaseController extends Controller
     {
         $query = AdminAccountPurchaseHistory::query()->search($request)->with('user');
 
-        return formatPaginate($query, $request);
+        return formatPaginate(
+            $query,
+            $request,
+            [],
+            SumConfig::for('account_purchase')
+        );
     }
 
     public function update(Request $request, int $id)
@@ -60,7 +66,7 @@ class AccountPurchaseController extends Controller
             'transfer_pin'  => 'nullable|regex:/^[1-9]{4}$/',
         ]);
 
-        $history = AdminAccountPurchaseHistory::withTrashed()->find($id);
+        $history = AdminAccountPurchaseHistory::withTrashed()->find($request->history_id);
 
         if (! $history) {
             return response()->json([
@@ -80,6 +86,7 @@ class AccountPurchaseController extends Controller
 
         DB::beginTransaction();
         try {
+            unset($account->history_id);
             $account->fill($validated)->save();
             DB::commit();
 

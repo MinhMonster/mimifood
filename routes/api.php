@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\NinjasController;
 use App\Http\Controllers\AvatarsController;
+use App\Http\Controllers\DragonBallController;
 use App\Http\Controllers\AccountPurchaseController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TopUpTransactionsController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\NinjasController as AdminNinjasController;
 use App\Http\Controllers\Admin\AvatarsController as AdminAvatarsController;
+use App\Http\Controllers\Admin\DragonBallController as AdminDragonBallController;
 use App\Http\Controllers\Admin\DiscountsController as AdminDiscountsController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\TopUpTransactionsController as AdminTopUpTransactionsController;
@@ -44,14 +46,19 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
 Route::get('/products/{link}', [ProductsController::class, 'show'])->name('products.show');
 
+// Ninja
 Route::get('/ninjas', [NinjasController::class, 'index'])->name('ninjas.index');
 Route::get('/ninjas/{code}', [NinjasController::class, 'show'])->name('ninjas.show');
-Route::get('/avatars', [AvatarsController::class, 'index'])->name('avatars.index');
-Route::get('/avatars/{code}', [AvatarsController::class, 'show'])->name('avatars.show');
 Route::get('/ninja-coin/prices', [NinjaCoinTransactionsController::class, 'prices'])
     ->name('ninja-coin.prices');
 Route::get('/carrot/prices', [CarrotTransactionsController::class, 'prices'])
     ->name('carrot.prices');
+// Avatar
+Route::get('/avatars', [AvatarsController::class, 'index'])->name('avatars.index');
+Route::get('/avatars/{code}', [AvatarsController::class, 'show'])->name('avatars.show');
+// Dragon Ball
+Route::get('/dragon-balls', [DragonBallController::class, 'index']);
+Route::get('/dragon-balls/{code}', [DragonBallController::class, 'show']);
 
 // settings
 Route::get('/notification', [SettingsController::class, 'notification'])->name('settings.notification');
@@ -111,6 +118,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
         Route::post('/avatars/destroy', [AdminAvatarsController::class, 'destroy'])->name('admin.avatars.destroy');
         Route::post('/avatars/restore', [AdminAvatarsController::class, 'restore'])->name('admin.avatars.restore');
         Route::get('/avatars/{id}', [AdminAvatarsController::class, 'show'])->name('admin.avatars.show');
+        // Admin Dragon ball
+        Route::get('/dragon-balls', [AdminDragonBallController::class, 'index'])->name('admin.dragon-balls.index');
+        Route::post('/dragon-balls/modify', [AdminDragonBallController::class, 'modify'])->name('admin.dragon-balls.modify');
+        Route::post('/dragon-balls/destroy', [AdminDragonBallController::class, 'destroy'])->name('admin.dragon-balls.destroy');
+        Route::post('/dragon-balls/restore', [AdminDragonBallController::class, 'restore'])->name('admin.dragon-balls.restore');
+        Route::get('/dragon-balls/{id}', [AdminDragonBallController::class, 'show'])->name('admin.dragon-balls.show');
     });
     // Admin Discount
     Route::get('/discounts', [AdminDiscountsController::class, 'index'])->name('admin.discounts.index');

@@ -14,21 +14,106 @@ if (!function_exists('is_active')) {
     }
 }
 
-if (!function_exists('formatPaginate')) {
-    function formatPaginate($query, $request, array $hidden = [])
+if (!function_exists('calculateSumsFromQuery')) {
+    function calculateSumsFromQuery($query, array $sumColumns): array
     {
+        $sums = [];
+
+        foreach ($sumColumns as $key => $config) {
+
+            /* =========================
+             | CASE 1: ['purchase_price']
+             ========================= */
+            if (is_int($key)) {
+                $column = $config;
+
+                if (!is_string($column)) continue;
+                if (!preg_match('/^[a-zA-Z0-9_]+$/', $column)) continue;
+
+                $sums[$column] = (int) (clone $query)->sum($column);
+                continue;
+            }
+
+            /* =========================
+             | CASE 2: ['selling_price' => 0.1]
+             ========================= */
+            if (is_numeric($config)) {
+                $column = $key;
+                $rate   = $config;
+
+                if (!is_string($column)) continue;
+                if (!preg_match('/^[a-zA-Z0-9_]+$/', $column)) continue;
+
+                $sum = (clone $query)->sum($column);
+                $sums[$column] = (int) round($sum * $rate);
+                continue;
+            }
+
+            /* =========================
+             | CASE 3: công thức (PLUS - MINUS)
+             ========================= */
+            if (is_array($config)) {
+                $result = 0;
+
+                // PLUS: ['col' => rate]
+                foreach ($config['plus'] ?? [] as $col => $rate) {
+                    if (!is_string($col)) continue;
+                    if (!preg_match('/^[a-zA-Z0-9_]+$/', $col)) continue;
+
+                    $sum = (clone $query)->sum($col);
+                    $result += $sum * ($rate ?? 1);
+                }
+
+                // MINUS: ['col1', 'col2']
+                foreach ($config['minus'] ?? [] as $col) {
+                    if (!is_string($col)) continue;
+                    if (!preg_match('/^[a-zA-Z0-9_]+$/', $col)) continue;
+
+                    $sum = (clone $query)->sum($col);
+                    $result -= $sum;
+                }
+
+                $sums[$key] = (int) round($result);
+            }
+        }
+
+        return $sums;
+    }
+}
+
+
+if (!function_exists('formatPaginate')) {
+    function formatPaginate(
+        $query,
+        $request,
+        array $hidden = [],
+        array $sumColumns = []
+    ) {
         $input = json_decode($request['input'] ?? '{}');
-        $pagination = $query
+
+        $pagination = (clone $query)
             ->orderBy('id', 'desc')
-            ->paginate($input->perPage ?? 30, ['*'], 'page', $input->page ?? 1);
+            ->paginate(
+                $input->perPage ?? 30,
+                ['*'],
+                'page',
+                $input->page ?? 1
+            );
 
         if (!empty($hidden)) {
             $pagination->getCollection()->each->makeHidden($hidden);
         }
 
-        $response = [
+        $sums = [];
+
+        if (!empty($sumColumns)) {
+            $sums = calculateSumsFromQuery($query, $sumColumns);
+        }
+
+        return response()->json([
             'response' => [
                 'count' => $pagination->total(),
+                'sums' => $sums,
                 'data' => $pagination->items(),
                 'meta' => [
                     'count' => $pagination->total(),
@@ -39,9 +124,8 @@ if (!function_exists('formatPaginate')) {
                     'to' => $pagination->lastItem(),
                 ]
             ],
-            'message' => 'Successs'
-        ];
-        return response()->json($response);
+            'message' => 'Success'
+        ]);
     }
 }
 

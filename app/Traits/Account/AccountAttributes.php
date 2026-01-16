@@ -27,4 +27,9 @@ trait AccountAttributes
 
         return max(0, (int) round($finalPrice));
     }
+
+    public function getProfitAttribute()
+    {
+        return $this->price - $this->purchase_price ;
+    }
 }

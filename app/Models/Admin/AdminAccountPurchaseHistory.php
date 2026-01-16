@@ -5,7 +5,6 @@ namespace App\Models\Admin;
 use App\Models\AccountPurchaseHistory;
 use Illuminate\Http\Request;
 
-
 class AdminAccountPurchaseHistory extends AccountPurchaseHistory
 {
     protected $table = 'account_purchase_histories';
@@ -82,6 +81,11 @@ class AdminAccountPurchaseHistory extends AccountPurchaseHistory
                 $model = null;
                 break;
         }
-        return $model ? $model->where('code', $this->account_code)->first() : null;
+        if (!$model) {
+            return null;
+        }
+        $account = $model->where('code', $this->account_code)->first();
+        $account ? $account->history_id = $this->id : $account;
+        return $account;
     }
 }

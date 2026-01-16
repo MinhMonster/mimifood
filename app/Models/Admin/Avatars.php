@@ -6,13 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+use App\Traits\Account\AccountRelations;
+use App\Traits\Account\AccountAttributes;
 
 class Avatars extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    use AccountRelations;
+    use AccountAttributes;
 
-    protected $appends = ['active_discount'];
+    protected $appends = ['active_discount', 'price', 'profit', 'account_type'];
 
     protected $fillable = [
         'code',
@@ -77,15 +81,8 @@ class Avatars extends Model
         });
     }
 
-    public function discount()
+    public function getAccountTypeAttribute()
     {
-        return Discounts::where('type', 'avatar')
-            ->where('is_active', true)
-            ->first();
-    }
-
-    public function getActiveDiscountAttribute()
-    {
-        return calculatePercentFromTiers($this->discount()->price_tiers ?? [], $this->selling_price);
+        return 'avatar';
     }
 }

@@ -134,6 +134,7 @@ return [
     'uuid' => ':attribute phải là UUID hợp lệ.',
 
     'attributes' => [
+        'username' => 'Tài khoản',
         'email' => 'Email',
         'password' => 'Mật khẩu',
         'password_confirmation' => 'Mật khẩu xác nhận',
@@ -142,5 +143,17 @@ return [
         'selling_price' => 'Giá bán',
         'purchase_price' => 'Giá nhập',
         'transfer_pin' => 'Mã pin',
+        'description' => 'Mô tả',
+        'strength' => 'Sức mạnh',
+        'disciple' => 'Đệ tử',
+        'server' => 'Máy chủ',
+        'type' => 'Loại Nick',
+        'planet' => 'Hành tinh',
+        'class' => 'Phái',
+        'code' =>  'Mã',
+        'sex' => 'Giới tính',
+        'land' => 'Đất',
+        'pets' => 'Vật nuôi',
+        'fish' => 'Cá'
     ],
 ];
