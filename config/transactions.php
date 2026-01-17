@@ -13,32 +13,32 @@ return [
     'types' => [
         'top_up' => [
             'label' => 'Nạp tiền',
-            'type'  => 'increase',
+            'direction'  => 'in',
             'content' => 'Nạp tiền vào ví',
         ],
         'purchase' => [
             'label' => 'Thanh toán đơn hàng',
-            'type'  => 'decrease',
+            'direction'  => 'out',
             'content' => 'Thanh toán cho đơn hàng',
         ],
         'refund' => [
             'label' => 'Hoàn tiền',
-            'type'  => 'increase',
+            'direction'  => 'in',
             'content' => 'Hoàn tiền cho đơn hàng',
         ],
         'admin_adjust_increase' => [
             'label' => 'Điều chỉnh tăng',
-            'type'  => 'increase',
+            'direction'  => 'in',
             'content' => 'Admin cộng tiền',
         ],
         'admin_adjust_decrease' => [
             'label' => 'Điều chỉnh giảm',
-            'type'  => 'decrease',
+            'direction'  => 'out',
             'content' => 'Admin trừ tiền',
         ],
         'withdraw' => [
             'label' => 'Rút tiền',
-            'type'  => 'decrease',
+            'direction'  => 'out',
             'content' => 'Rút tiền khỏi ví',
         ],
     ],

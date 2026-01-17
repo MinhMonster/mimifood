@@ -37,7 +37,7 @@ class UserController extends Controller
             WalletTransaction::create([
                 'user_id'        => $user->id,
                 'type'           => $type,
-                'direction'      => $direction,
+                'direction'      => $transaction['direction'],
                 'amount'         => $amount,
                 'balance_before' => $balanceBefore,
                 'balance_after'  => $user->cash,

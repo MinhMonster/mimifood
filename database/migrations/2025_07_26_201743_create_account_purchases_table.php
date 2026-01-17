@@ -4,11 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAccountPurchaseHistoriesTable extends Migration
+class CreateAccountPurchaseTable extends Migration
 {
     public function up()
     {
-        Schema::create('account_purchase_histories', function (Blueprint $table) {
+        Schema::create('account_purchases', function (Blueprint $table) {
             $table->id();
             $table->string('account_type');
             $table->unsignedBigInteger('account_code');
@@ -25,6 +25,6 @@ class CreateAccountPurchaseHistoriesTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('account_purchase_histories');
+        Schema::dropIfExists('account_purchases');
     }
 }

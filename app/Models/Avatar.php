@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use App\Traits\Account\AccountRelations;
 use App\Traits\Account\AccountAttributes;
 
-class Avatars extends Model
+class Avatar extends Model
 {
     use HasFactory;
     use SoftDeletes;

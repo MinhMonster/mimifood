@@ -13,13 +13,16 @@ class WalletTransaction extends Model
         'updated_at'    => 'datetime:Y-m-d H:i:s',
     ];
 
-    protected $hidden = ['user_id', 'updated_at'];
+    protected $appends = ['reference'];
+
+    protected $hidden = ['user_id', 'updated_at', 'reference_type', 'reference_id'];
 
     protected $fillable = [
         'user_id',
         'direction',
         'type',
-        'meta',
+        'reference_type',
+        'reference_id',
         'amount',
         'balance_before',
         'balance_after',

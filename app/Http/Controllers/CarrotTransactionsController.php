@@ -89,7 +89,7 @@ class CarrotTransactionsController extends Controller
             $user->save();
 
             // 🧾 Tạo giao dịch nạp (PENDING)
-            $transaction = CarrotTransaction::create([
+            $carrotTransaction = CarrotTransaction::create([
                 'user_id'   => $user->id,
                 'game_type' => $validated['game_type'],
                 'username'  => $validated['username'],
@@ -100,24 +100,25 @@ class CarrotTransactionsController extends Controller
             ]);
 
             // 📒 Ghi lịch sử ví
-            $walletConfig = config('transactions.types.carrot_topup');
+            $walletConfig = config('transactions.types.purchase');
 
             WalletTransaction::create([
                 'user_id'        => $user->id,
-                'type'           => 'carrot_topup',
+                'type'           => 'purchase',
+                'reference_type' => CarrotTransaction::class,
+                'reference_id'   => $carrotTransaction->id,
                 'direction'      => $walletConfig['type'], // out
                 'amount'         => $price,
                 'balance_before' => $balanceBefore,
                 'balance_after'  => $user->cash,
-                'description'    => $walletConfig['content'],
-                'meta'           => $transaction,
+                'description'    => $walletConfig['content']  . " Carrot #{$carrotTransaction->id}",
             ]);
 
             DB::commit();
 
             return response()->json([
                 'message' => 'Thành công',
-                'data'    => $transaction,
+                'data'    => $carrotTransaction,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

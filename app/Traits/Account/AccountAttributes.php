@@ -8,7 +8,7 @@ trait AccountAttributes
     public function getActiveDiscountAttribute()
     {
         return calculatePercentFromTiers(
-            $this->discount()->price_tiers ?? [],
+            $this->discounts()->price_tiers ?? [],
             $this->selling_price
         );
     }

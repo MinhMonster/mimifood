@@ -2,22 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ninjas;
+use App\Models\Ninja;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-class NinjasController extends Controller
+class NinjaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Ninjas::where('is_sold', false)->orderByDesc('code')->search($request);
+        $query = Ninja::where('is_sold', false)->orderByDesc('code')->search($request);
         return formatPaginate($query, $request);
     }
 
     public function show($code)
     {
-        $ninja = Ninjas::where('code', $code)->where('is_sold', false)->first();
+        $ninja = Ninja::where('code', $code)->where('is_sold', false)->first();
         if (!$ninja) {
             return response()->json([
                 'status' => 'error',

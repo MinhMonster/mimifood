@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Admin\Avatars; // Import model
+use App\Models\Admin\Avatar; // Import model
 use App\Http\Controllers\Controller;
 use App\Support\SumConfig;
 use Illuminate\Support\Facades\Validator;
@@ -10,11 +10,11 @@ use Illuminate\Validation\Rule;
 
 use Illuminate\Http\Request;
 
-class AvatarsController extends Controller
+class AvatarController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Avatars::query()->search($request)->orderByDesc('code');
+        $query = Avatar::query()->search($request)->orderByDesc('code');
 
         return formatPaginate(
             $query,
@@ -65,11 +65,11 @@ class AvatarsController extends Controller
         $validated = $validator->validated();
 
         if (empty($validated['code'])) {
-            $validated['code'] = (Avatars::max('code') ?? 0) + 1;
+            $validated['code'] = (Avatar::max('code') ?? 0) + 1;
         }
 
         if (!$oldId) {
-            $avatar = new Avatars();
+            $avatar = new Avatar();
             if (!empty($validated['id'])) {
                 $avatar->id = $validated['id'];
             }
@@ -78,7 +78,7 @@ class AvatarsController extends Controller
             return fetchData($avatar);
         }
 
-        $oldAvatar = Avatars::withTrashed()->find($oldId);
+        $oldAvatar = Avatar::withTrashed()->find($oldId);
         if (!$oldAvatar) {
             return response()->json([
                 'status' => 'error',
@@ -106,7 +106,7 @@ class AvatarsController extends Controller
 
     public function show(Request $request)
     {
-        $avatar = Avatars::withTrashed()->find($request->id);
+        $avatar = Avatar::withTrashed()->find($request->id);
 
         if (!$avatar) {
             return response()->json([
@@ -128,7 +128,7 @@ class AvatarsController extends Controller
     public function destroy(Request $request)
     {
         $id = $request->id;
-        $avatar = Avatars::withTrashed()->find($id);
+        $avatar = Avatar::withTrashed()->find($id);
 
         if (! $avatar) {
             return response()->json([
@@ -154,7 +154,7 @@ class AvatarsController extends Controller
     public function restore(Request $request)
     {
         $id = $request->id;
-        $avatar = Avatars::withTrashed()->find($id);
+        $avatar = Avatar::withTrashed()->find($id);
 
         if (! $avatar) {
             return response()->json([

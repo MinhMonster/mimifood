@@ -10,7 +10,7 @@ class WalletTransactionController extends Controller
 {
     public function index(Request $request)
     {
-        $query = WalletTransaction::query()->search($request)->with('user');
+        $query = WalletTransaction::query()->search($request)->with('user', 'reference');
 
         return formatPaginate($query, $request);
     }

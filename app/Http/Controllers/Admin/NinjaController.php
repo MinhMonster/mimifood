@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Admin\Ninjas; // Import model
+use App\Models\Admin\Ninja; // Import model
 use App\Http\Controllers\Controller;
 use App\Support\SumConfig;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 
-class NinjasController extends Controller
+class NinjaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Ninjas::query()->search($request)->orderByDesc('code');
+        $query = Ninja::query()->search($request)->orderByDesc('code');
 
         return formatPaginate(
             $query,
@@ -91,10 +91,10 @@ class NinjasController extends Controller
         $validated = $validator->validated();
 
         if (empty($validated['code'])) {
-            $validated['code'] = (Ninjas::max('code') ?? 0) + 1;
+            $validated['code'] = (Ninja::max('code') ?? 0) + 1;
         }
         if (!$oldId) {
-            $ninja = new Ninjas();
+            $ninja = new Ninja();
             if (!empty($validated['id'])) {
                 $ninja->id = $validated['id'];
             }
@@ -103,7 +103,7 @@ class NinjasController extends Controller
             return fetchData($ninja);
         }
 
-        $oldNinja = Ninjas::withTrashed()->find($oldId);
+        $oldNinja = Ninja::withTrashed()->find($oldId);
         if (!$oldNinja) {
             return response()->json([
                 'status' => 'error',
@@ -131,7 +131,7 @@ class NinjasController extends Controller
 
     public function show(Request $request)
     {
-        $ninja = Ninjas::withTrashed()->find($request->id);
+        $ninja = Ninja::withTrashed()->find($request->id);
 
         if (!$ninja) {
             return response()->json([
@@ -153,7 +153,7 @@ class NinjasController extends Controller
     public function destroy(Request $request)
     {
         $id = $request->id;
-        $ninja = Ninjas::withTrashed()->find($id);
+        $ninja = Ninja::withTrashed()->find($id);
 
         if (! $ninja) {
             return response()->json([
@@ -179,7 +179,7 @@ class NinjasController extends Controller
     public function restore(Request $request)
     {
         $id = $request->id;
-        $ninja = Ninjas::withTrashed()->find($id);
+        $ninja = Ninja::withTrashed()->find($id);
 
         if (! $ninja) {
             return response()->json([

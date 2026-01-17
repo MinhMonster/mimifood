@@ -2,12 +2,14 @@
 
 namespace App\Models\Admin;
 
-use App\Models\AccountPurchaseHistory;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AdminAccountPurchaseHistory extends AccountPurchaseHistory
+class AccountPurchase extends Model
 {
-    protected $table = 'account_purchase_histories';
+    use SoftDeletes;
+    protected $table = 'account_purchases';
 
     /**
      * Hiển thị thêm field cho admin
@@ -63,6 +65,11 @@ class AdminAccountPurchaseHistory extends AccountPurchaseHistory
         });
     }
 
+    public function getPurchasedAtAttribute()
+    {
+        return $this->created_at->format('d-m-Y - H:i:s');
+    }
+
     public function getAccountAttribute()
     {
         if (!$this->account_type || !$this->account_code) {
@@ -72,10 +79,10 @@ class AdminAccountPurchaseHistory extends AccountPurchaseHistory
         $model = null;
         switch ($this->account_type) {
             case 'ninja':
-                $model = Ninjas::query()->select('id', 'code', 'username', 'password', 'transfer_pin');
+                $model = Ninja::query()->select('id', 'code', 'username', 'password', 'transfer_pin');
                 break;
             case 'avatar':
-                $model = Avatars::query()->select('id', 'code', 'username', 'password', 'transfer_pin');
+                $model = Avatar::query()->select('id', 'code', 'username', 'password', 'transfer_pin');
                 break;
             default:
                 $model = null;
@@ -84,8 +91,12 @@ class AdminAccountPurchaseHistory extends AccountPurchaseHistory
         if (!$model) {
             return null;
         }
-        $account = $model->where('code', $this->account_code)->first();
-        $account ? $account->history_id = $this->id : $account;
-        return $account;
+        return $model->where('code', $this->account_code)->first();
+    }
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

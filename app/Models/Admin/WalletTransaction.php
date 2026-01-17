@@ -26,6 +26,11 @@ class WalletTransaction extends Model
         'description',
     ];
 
+    public function reference()
+    {
+        return $this->morphTo();
+    }
+
     /**
      *
      * @param  Builder  $query

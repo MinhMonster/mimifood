@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Avatars;
+use App\Models\Avatar;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-class AvatarsController extends Controller
+class AvatarController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Avatars::where('is_sold', false)->orderByDesc('code')->search($request);
+        $query = Avatar::where('is_sold', false)->orderByDesc('code')->search($request);
 
         return formatPaginate($query, $request);
     }
 
     public function show($code)
     {
-        $avatar = Avatars::where('code', $code)->where('is_sold', false)->first();
+        $avatar = Avatar::where('code', $code)->where('is_sold', false)->first();
 
         if (!$avatar) {
             return response()->json([

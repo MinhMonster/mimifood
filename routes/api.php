@@ -6,8 +6,8 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductsController;
-use App\Http\Controllers\NinjasController;
-use App\Http\Controllers\AvatarsController;
+use App\Http\Controllers\NinjaController;
+use App\Http\Controllers\AvatarController;
 use App\Http\Controllers\DragonBallController;
 use App\Http\Controllers\AccountPurchaseController;
 use App\Http\Controllers\SettingsController;
@@ -18,14 +18,15 @@ use App\Http\Controllers\CarrotTransactionsController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
-use App\Http\Controllers\Admin\NinjasController as AdminNinjasController;
-use App\Http\Controllers\Admin\AvatarsController as AdminAvatarsController;
+use App\Http\Controllers\Admin\NinjaController as AdminNinjaController;
+use App\Http\Controllers\Admin\AvatarController as AdminAvatarController;
 use App\Http\Controllers\Admin\DragonBallController as AdminDragonBallController;
 use App\Http\Controllers\Admin\DiscountsController as AdminDiscountsController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\TopUpTransactionsController as AdminTopUpTransactionsController;
+use App\Http\Controllers\Admin\CarrotTransactionController as AdminCarrotTransactionController;
 use App\Http\Controllers\Admin\WalletTransactionController as AdminWalletTransactionController;
-use App\Http\Controllers\Admin\AccountPurchaseController as AdminAccountPurchaseHistoryController;
+use App\Http\Controllers\Admin\AccountPurchaseController as AdminAccountPurchaseController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\FileController;
 
@@ -47,15 +48,15 @@ Route::get('/products', [ProductsController::class, 'index'])->name('products.in
 Route::get('/products/{link}', [ProductsController::class, 'show'])->name('products.show');
 
 // Ninja
-Route::get('/ninjas', [NinjasController::class, 'index'])->name('ninjas.index');
-Route::get('/ninjas/{code}', [NinjasController::class, 'show'])->name('ninjas.show');
+Route::get('/ninjas', [NinjaController::class, 'index'])->name('ninjas.index');
+Route::get('/ninjas/{code}', [NinjaController::class, 'show'])->name('ninjas.show');
 Route::get('/ninja-coin/prices', [NinjaCoinTransactionsController::class, 'prices'])
     ->name('ninja-coin.prices');
 Route::get('/carrot/prices', [CarrotTransactionsController::class, 'prices'])
     ->name('carrot.prices');
 // Avatar
-Route::get('/avatars', [AvatarsController::class, 'index'])->name('avatars.index');
-Route::get('/avatars/{code}', [AvatarsController::class, 'show'])->name('avatars.show');
+Route::get('/avatars', [AvatarController::class, 'index'])->name('avatars.index');
+Route::get('/avatars/{code}', [AvatarController::class, 'show'])->name('avatars.show');
 // Dragon Ball
 Route::get('/dragon-balls', [DragonBallController::class, 'index']);
 Route::get('/dragon-balls/{code}', [DragonBallController::class, 'show']);
@@ -65,9 +66,9 @@ Route::get('/notification', [SettingsController::class, 'notification'])->name('
 // user
 Route::group(['middleware' => 'is_user'], function () {
     Route::get('/user', [UserController::class, 'user'])->name('user');
-    Route::post('/account-purchase', [AccountPurchaseController::class, 'purchase']);
-    Route::get('/account-purchase-histories', [AccountPurchaseController::class, 'index']);
-    Route::get('/account-purchase-histories/{id}', [AccountPurchaseController::class, 'show']);
+    Route::post('/account-purchases', [AccountPurchaseController::class, 'purchase']);
+    Route::get('/account-purchases', [AccountPurchaseController::class, 'index']);
+    Route::get('/account-purchases/{id}', [AccountPurchaseController::class, 'show']);
     Route::prefix('top-up')->name('top-up.')->group(function () {
         Route::post('/bank', [TopUpTransactionsController::class, 'store'])->name('bank.store');
         Route::get('/bank/histories', [TopUpTransactionsController::class, 'index'])->name('bank.histories');
@@ -107,17 +108,17 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
     Route::delete('/files/{id}/delete', [FileController::class, 'delete'])->name('admin.files.delete');
     Route::group(['prefix' => 'game'], function () {
         // Admin Ninja
-        Route::get('/ninjas', [AdminNinjasController::class, 'index'])->name('admin.ninjas.index');
-        Route::post('/ninjas/modify', [AdminNinjasController::class, 'modify'])->name('admin.ninjas.modify');
-        Route::post('/ninjas/destroy', [AdminNinjasController::class, 'destroy'])->name('admin.ninjas.destroy');
-        Route::post('/ninjas/restore', [AdminNinjasController::class, 'restore'])->name('admin.ninjas.restore');
-        Route::get('/ninjas/{id}', [AdminNinjasController::class, 'show'])->name('admin.ninjas.show');
+        Route::get('/ninjas', [AdminNinjaController::class, 'index'])->name('admin.ninjas.index');
+        Route::post('/ninjas/modify', [AdminNinjaController::class, 'modify'])->name('admin.ninjas.modify');
+        Route::post('/ninjas/destroy', [AdminNinjaController::class, 'destroy'])->name('admin.ninjas.destroy');
+        Route::post('/ninjas/restore', [AdminNinjaController::class, 'restore'])->name('admin.ninjas.restore');
+        Route::get('/ninjas/{id}', [AdminNinjaController::class, 'show'])->name('admin.ninjas.show');
         // Admin Avatar
-        Route::get('/avatars', [AdminAvatarsController::class, 'index'])->name('admin.avatars.index');
-        Route::post('/avatars/modify', [AdminAvatarsController::class, 'modify'])->name('admin.avatars.modify');
-        Route::post('/avatars/destroy', [AdminAvatarsController::class, 'destroy'])->name('admin.avatars.destroy');
-        Route::post('/avatars/restore', [AdminAvatarsController::class, 'restore'])->name('admin.avatars.restore');
-        Route::get('/avatars/{id}', [AdminAvatarsController::class, 'show'])->name('admin.avatars.show');
+        Route::get('/avatars', [AdminAvatarController::class, 'index'])->name('admin.avatars.index');
+        Route::post('/avatars/modify', [AdminAvatarController::class, 'modify'])->name('admin.avatars.modify');
+        Route::post('/avatars/destroy', [AdminAvatarController::class, 'destroy'])->name('admin.avatars.destroy');
+        Route::post('/avatars/restore', [AdminAvatarController::class, 'restore'])->name('admin.avatars.restore');
+        Route::get('/avatars/{id}', [AdminAvatarController::class, 'show'])->name('admin.avatars.show');
         // Admin Dragon ball
         Route::get('/dragon-balls', [AdminDragonBallController::class, 'index'])->name('admin.dragon-balls.index');
         Route::post('/dragon-balls/modify', [AdminDragonBallController::class, 'modify'])->name('admin.dragon-balls.modify');
@@ -136,10 +137,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
     Route::post('/settings/modify', [AdminSettingsController::class, 'modify'])->name('admin.settings.modify');
     Route::get('/top-up-transactions', [AdminTopUpTransactionsController::class, 'index'])->name('admin.topUpTransactions.index');
     Route::post('/top-up-transactions/update', [AdminTopUpTransactionsController::class, 'update'])->name('admin.topUpTransactions.update');
-    Route::prefix('account-purchase-histories')->name('admin.accountPurchaseHistories.')->group(function () {
-        Route::get('/', [AdminAccountPurchaseHistoryController::class, 'index'])->name('index');
-        Route::post('/{id}/update', [AdminAccountPurchaseHistoryController::class, 'update'])->name('update');
-        Route::post('/{id}/update-account', [AdminAccountPurchaseHistoryController::class, 'updateAccount'])->name('updateAccount');
+    Route::prefix('account-purchases')->name('admin.accountPurchases.')->group(function () {
+        Route::get('/', [AdminAccountPurchaseController::class, 'index'])->name('index');
+        Route::post('/{id}/update', [AdminAccountPurchaseController::class, 'update'])->name('update');
+        Route::post('/{id}/update-account', [AdminAccountPurchaseController::class, 'updateAccount'])->name('updateAccount');
     });
 
     Route::prefix('wallet-transactions')
@@ -150,4 +151,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
             Route::get('/{id}', 'show')->name('show');
             Route::delete('/{id}', 'destroy')->name('destroy');
         });
+    Route::prefix('/carrots')->name('carrots.')->group(function () {
+        Route::get('/', [AdminCarrotTransactionController::class, 'index'])
+            ->name('index');
+        Route::post('/update-status', [AdminCarrotTransactionController::class, 'updateStatus'])
+            ->name('update-status');
+    });
 });

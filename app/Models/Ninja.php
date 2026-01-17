@@ -10,7 +10,7 @@ use App\Traits\HidesTimestamps;
 use App\Traits\Account\AccountRelations;
 use App\Traits\Account\AccountAttributes;
 
-class Ninjas extends Model
+class Ninja extends Model
 {
     use HasFactory;
     use SoftDeletes;

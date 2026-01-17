@@ -21,12 +21,12 @@ class TopUpRequest extends FormRequest
                 'min:1',
                 function ($attribute, $value, $fail) {
                     $user = $this->route('user');
-                    if ($this->type === 'decrease' && $user->cash < $value) {
+                    if ($this->direction === 'out' && $user->cash < $value) {
                         $fail('Số dư không đủ để trừ: '. number_format($user->cash));
                     }
                 },
             ],
-            'type' => ['required', Rule::in(['increase', 'decrease'])],
+            'direction' => ['required', Rule::in(['in', 'out'])],
         ];
     }
 

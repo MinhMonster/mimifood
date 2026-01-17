@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
-use App\Models\Ninjas;
-use App\Models\Avatars;
-use App\Models\AccountPurchaseHistory;
+use App\Models\Ninja;
+use App\Models\Avatar;
+use App\Models\DragonBall;
+use App\Models\AccountPurchase;
 use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AdminPurchaseNotification;
@@ -20,14 +21,14 @@ class AccountPurchaseController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $query = AccountPurchaseHistory::query()->where('user_id', $user->id);
+        $query = AccountPurchase::query()->where('user_id', $user->id);
         return formatPaginate($query, $request, ['account']);
     }
 
     public function show(Request $request)
     {
         $user = Auth::user();
-        $history = AccountPurchaseHistory::query()
+        $history = AccountPurchase::query()
             ->where('user_id', $user->id)
             ->where('id', $request->id)->first();
 
@@ -61,10 +62,13 @@ class AccountPurchaseController extends Controller
 
         switch ($accountType) {
             case 'ninja':
-                $accountModel = Ninjas::class;
+                $accountModel = Ninja::class;
                 break;
             case 'avatar':
-                $accountModel = Avatars::class;
+                $accountModel = Avatar::class;
+                break;
+            case 'dragon_ball':
+                $accountModel = DragonBall::class;
                 break;
             default:
                 return response()->json(['message' => 'Loại game không tồn tại!'], 400);
@@ -96,7 +100,7 @@ class AccountPurchaseController extends Controller
             $account->save();
 
             // create history buy account
-            $history = AccountPurchaseHistory::create([
+            $accountPurchase = AccountPurchase::create([
                 'account_type' => $accountType,
                 'account_code' => $account->code,
                 'user_id' => $userId,
@@ -109,30 +113,31 @@ class AccountPurchaseController extends Controller
             WalletTransaction::create([
                 'user_id'        => $userId,
                 'type'           => 'purchase',
+                'reference_type' => AccountPurchase::class,
+                'reference_id'   => $accountPurchase->id,
                 'direction'      => $transaction['type'],
                 'amount'         => $price,
                 'balance_before' => $balanceBefore,
                 'balance_after'  => $user->cash,
                 'description'    => $transaction['content'],
-                'meta'           => $history
             ]);
 
             DB::commit();
 
             try {
                 Mail::to(config('mail.admin_email'))
-                    ->queue(new AdminPurchaseNotification($user, $account, $history));
+                    ->queue(new AdminPurchaseNotification($user, $account, $accountPurchase));
             } catch (\Throwable $e) {
                 Log::error('Send admin purchase mail failed', [
                     'user_id' => $user->id,
-                    'account_code' => $history->account_code,
+                    'account_code' => $accountPurchase->account_code,
                     'error' => $e->getMessage(),
                 ]);
             }
 
             return response()->json([
                 'message' => 'Mua tài khoản thành công',
-                'data' => $history,
+                'data' => $accountPurchase,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
