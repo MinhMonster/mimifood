@@ -5,7 +5,7 @@ namespace App\Http\Requests\Admin;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class TopUpRequest extends FormRequest
+class UserCashRequest extends FormRequest
 {
     public function authorize()
     {
@@ -22,7 +22,7 @@ class TopUpRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $user = $this->route('user');
                     if ($this->direction === 'out' && $user->cash < $value) {
-                        $fail('Số dư không đủ để trừ: '. number_format($user->cash));
+                        $fail('Số dư không đủ để trừ: ' . number_format($user->cash));
                     }
                 },
             ],
@@ -36,8 +36,8 @@ class TopUpRequest extends FormRequest
             'amount.required' => 'Vui lòng nhập số tiền.',
             'amount.numeric'  => 'Số tiền phải là số.',
             'amount.min'      => 'Số tiền tối thiểu là 1.',
-            'type.required'   => 'Vui lòng chọn loại giao dịch.',
-            'type.in'         => 'Loại giao dịch không hợp lệ.',
+            'direction.required'   => 'Vui lòng chọn loại giao dịch.',
+            'direction.in'         => 'Loại giao dịch không hợp lệ.',
         ];
     }
 }

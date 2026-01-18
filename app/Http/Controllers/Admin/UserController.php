@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Admin\User;
 use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\Admin\TopUpRequest;
+use App\Http\Requests\Admin\UserCashRequest;
 
 class UserController extends Controller
 {
@@ -18,14 +18,14 @@ class UserController extends Controller
         return formatPaginate($query, $request);
     }
 
-    public function topUp(TopUpRequest $request, User $user)
+    public function updateCash(UserCashRequest $request, User $user)
     {
         try {
             DB::beginTransaction();
             $balanceBefore = $user->cash;
-            $direction = $request->type;
+            $direction = $request->direction;
             $amount = $request->amount;
-            if ($direction === 'increase') {
+            if ($direction === 'in') {
                 $user->increment('cash', $amount);
                 $type = 'admin_adjust_increase';
             } else {
@@ -41,23 +41,50 @@ class UserController extends Controller
                 'amount'         => $amount,
                 'balance_before' => $balanceBefore,
                 'balance_after'  => $user->cash,
-                'reference'      => uniqid('TXN-'),
                 'description'    => $transaction['content'],
             ]);
 
             DB::commit();
-            return fetchData(
-                [
-                    'cash' => $user->cash,
-                    'type' => $direction
-                ],
-                $direction . ' successful'
-            );
+            return response()->json([
+                'message' => $transaction['content'] . " thành công!",
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'message' => $direction . ' failed',
                 'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function updateStatus(Request $request, User $user)
+    {
+        try {
+            DB::beginTransaction();
+
+            $statusBefore = $user->status;
+            $statusAfter  = $request->status === "locked" ? "locked" : "active";
+            $message = $statusAfter === "locked" ? "Khoá thành công" : "Mở khoá thành công";
+
+            if ($statusBefore === $statusAfter) {
+                return response()->json([
+                    'message' => $message,
+                ]);
+            }
+
+            $user->update([
+                'status' => $statusAfter,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => $message,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => "Có lỗi xảy ra",
             ], 500);
         }
     }
