@@ -2,13 +2,13 @@
 
 namespace App\Traits\Account;
 
-use App\Models\Discounts;
+use App\Models\Discount;
 
 trait AccountRelations
 {
     public function discounts()
     {
-        return Discounts::where('type', $this->account_type)
+        return Discount::where('type', $this->account_type)
             ->where('is_active', true)
             ->first();
     }

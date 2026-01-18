@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Admin\Discounts;
+use App\Models\Admin\Discount;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
-class DiscountsController extends Controller
+class DiscountController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Discounts::query();
+        $query = Discount::query();
         return formatPaginate($query, $request);
     }
 
@@ -32,47 +33,57 @@ class DiscountsController extends Controller
             // 'price_tiers.*.max' => 'required_with:price_tiers|numeric|gte:price_tiers.*.min',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         $validated = $validator->validated();
         if ($id) {
-            $discount = Discounts::findOrFail($id);
+            $discount = Discount::findOrFail($id);
             $discount->update($validated);
-            $message = 'Discount updated successfully.';
         } else {
-            $discount = Discounts::create($validated);
-            $message = 'Discount created successfully.';
+            $discount = Discount::create($validated);
         }
 
-        return response()->json([
-            'message' => $message,
-            'data' => $discount,
-        ], $id ? 200 : 201);
+        return fetchData($discount);
     }
 
-    public function show(Request $request)
+    public function show(Discount $discount)
     {
-        $ninja = Discounts::withTrashed()->find($request->id);
 
-        if (!$ninja) {
+        if (!$discount) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Ninja not found',
+                'message' => 'Discount không tồn tại',
             ], 404);
         }
 
-        return fetchData($ninja);
+        return fetchData($discount);
+    }
+
+
+    public function setActive(Discount $discount)
+    {
+        DB::transaction(function () use ($discount) {
+
+            $newStatus = ! $discount->is_active;
+
+            if ($newStatus === true) {
+                Discount::where('type', $discount->type)
+                    ->where('id', '!=', $discount->id)
+                    ->where('is_active', true)
+                    ->update(['is_active' => false]);
+            }
+
+            $discount->update([
+                'is_active' => $newStatus,
+            ]);
+        });
+
+        return response()->json([
+            'message' => 'Cập nhật thành công!',
+        ]);
     }
 
     public function destroy($id)
     {
-        $discount = Discounts::findOrFail($id);
+        $discount = Discount::findOrFail($id);
         $discount->delete();
 
         return response()->json(['message' => 'Discount deleted successfully.']);

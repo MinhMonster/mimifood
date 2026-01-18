@@ -21,7 +21,7 @@ use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\NinjaController as AdminNinjaController;
 use App\Http\Controllers\Admin\AvatarController as AdminAvatarController;
 use App\Http\Controllers\Admin\DragonBallController as AdminDragonBallController;
-use App\Http\Controllers\Admin\DiscountsController as AdminDiscountsController;
+use App\Http\Controllers\Admin\DiscountController as AdminDiscountController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\TopUpTransactionsController as AdminTopUpTransactionsController;
 use App\Http\Controllers\Admin\CarrotTransactionController as AdminCarrotTransactionController;
@@ -130,11 +130,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
         Route::get('/dragon-balls/{id}', [AdminDragonBallController::class, 'show'])->name('admin.dragon-balls.show');
     });
     // Admin Discount
-    Route::get('/discounts', [AdminDiscountsController::class, 'index'])->name('admin.discounts.index');
-    Route::post('/discounts/modify', [AdminDiscountsController::class, 'modify'])->name('admin.discounts.modify');
-    Route::post('/discounts/destroy', [AdminDiscountsController::class, 'destroy'])->name('admin.discounts.destroy');
-    Route::post('/discounts/restore', [AdminDiscountsController::class, 'restore'])->name('admin.discounts.restore');
-    Route::get('/discounts/{id}', [AdminDiscountsController::class, 'show'])->name('admin.discounts.show');
+    Route::prefix('discounts')->name('admin.discounts.')->controller(AdminDiscountController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('{discount}', 'show')->name('show');
+            Route::post('/modify', 'modify')->name('modify');
+            Route::delete('{discount}', 'destroy')->name('destroy');
+            Route::get('{discount}/active', 'setActive')->name('active');
+        });
     // Admin Settings
     Route::get('/settings', [AdminSettingsController::class, 'show'])->name('admin.settings.show');
     Route::post('/settings/modify', [AdminSettingsController::class, 'modify'])->name('admin.settings.modify');

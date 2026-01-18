@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 
-class Discounts extends Model
+class Discount extends Model
 {
     use HasFactory, SoftDeletes;
 
