@@ -70,8 +70,10 @@ Route::group(['middleware' => 'is_user'], function () {
     Route::get('/account-purchases', [AccountPurchaseController::class, 'index']);
     Route::get('/account-purchases/{id}', [AccountPurchaseController::class, 'show']);
     Route::prefix('top-up')->name('top-up.')->group(function () {
-        Route::post('/bank', [TopUpTransactionsController::class, 'store'])->name('bank.store');
-        Route::get('/bank/histories', [TopUpTransactionsController::class, 'index'])->name('bank.histories');
+        Route::prefix('transactions')->name('transactions.')->group(function () {
+            Route::get('/bank', [TopUpTransactionsController::class, 'index'])->name('bank.index');
+            Route::post('/bank', [TopUpTransactionsController::class, 'store'])->name('bank.store');
+        });
     });
     Route::prefix('account')->name('top-up.')->group(function () {
         Route::get('/transactions', [WalletTransactionController::class, 'index'])->name('account.transactions');
@@ -131,12 +133,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
     });
     // Admin Discount
     Route::prefix('discounts')->name('admin.discounts.')->controller(AdminDiscountController::class)->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('{discount}', 'show')->name('show');
-            Route::post('/modify', 'modify')->name('modify');
-            Route::delete('{discount}', 'destroy')->name('destroy');
-            Route::get('{discount}/active', 'setActive')->name('active');
-        });
+        Route::get('/', 'index')->name('index');
+        Route::get('{discount}', 'show')->name('show');
+        Route::post('/modify', 'modify')->name('modify');
+        Route::delete('{discount}', 'destroy')->name('destroy');
+        Route::get('{discount}/active', 'setActive')->name('active');
+    });
     // Admin Settings
     Route::get('/settings', [AdminSettingsController::class, 'show'])->name('admin.settings.show');
     Route::post('/settings/modify', [AdminSettingsController::class, 'modify'])->name('admin.settings.modify');

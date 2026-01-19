@@ -1,6 +1,10 @@
 <h2>Đơn mua tài khoản mới</h2>
 
-<p><strong>Người mua:</strong> {{ $user->name }} (ID: {{ $user->id }})</p>
+<p><strong>Người dùng:</strong> {{ $user->name }}</p>
+<p><strong>User ID:</strong> {{ $user->id }}</p>
+
+<hr>
+
 <p><strong>Loại tài khoản:</strong> {{ strtoupper($history->account_type) }}</p>
 <p><strong>Mã tài khoản:</strong> {{ number_format($history->account_code) }}</p>
 <p><strong>Giá bán:</strong> {{ number_format($history->selling_price) }} đ</p>
@@ -9,4 +13,6 @@
 
 <hr>
 
-<p>Vui lòng vào admin panel để xử lý tiếp.</p>
+<p>
+    👉 Vào trang admin để xử lý giao dịch.
+</p>

@@ -4,13 +4,14 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use App\Models\User;
 use Illuminate\Queue\SerializesModels;
 
 class AdminPurchaseNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user;
+    public User $user;
     public $account;
     public $history;
 

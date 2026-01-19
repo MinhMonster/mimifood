@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
 use App\Models\Ninja;
 use App\Models\Avatar;
 use App\Models\DragonBall;
@@ -20,14 +18,14 @@ class AccountPurchaseController extends Controller
 {
     public function index(Request $request)
     {
-        $user = Auth::user();
+        $user = $request->user();
         $query = AccountPurchase::query()->where('user_id', $user->id);
         return formatPaginate($query, $request, ['account']);
     }
 
     public function show(Request $request)
     {
-        $user = Auth::user();
+        $user = $request->user();
         $history = AccountPurchase::query()
             ->where('user_id', $user->id)
             ->where('id', $request->id)->first();
@@ -53,8 +51,7 @@ class AccountPurchaseController extends Controller
             return response()->json(['message' => 'Invalid data'], 400);
         }
 
-        /** @var User $user */
-        $user = Auth::user();
+        $user = $request->user();
         $userId = $user->id;
         $balanceBefore = $user->cash;
         $accountType = $request->input('account_type');
@@ -115,7 +112,7 @@ class AccountPurchaseController extends Controller
                 'type'           => 'purchase',
                 'reference_type' => AccountPurchase::class,
                 'reference_id'   => $accountPurchase->id,
-                'direction'      => $transaction['type'],
+                'direction'      => $transaction['direction'],
                 'amount'         => $price,
                 'balance_before' => $balanceBefore,
                 'balance_after'  => $user->cash,
