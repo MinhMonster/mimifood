@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('phone');
             $table->integer('cash')->default(0);
             $table->string('status')->default('active');
+            $table->boolean('is_admin')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

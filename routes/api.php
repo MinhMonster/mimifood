@@ -6,6 +6,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\TopicController;
 use App\Http\Controllers\NinjaController;
 use App\Http\Controllers\AvatarController;
 use App\Http\Controllers\DragonBallController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\CarrotTransactionsController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
+use App\Http\Controllers\Admin\TopicController as AdminTopicController;
 use App\Http\Controllers\Admin\NinjaController as AdminNinjaController;
 use App\Http\Controllers\Admin\AvatarController as AdminAvatarController;
 use App\Http\Controllers\Admin\DragonBallController as AdminDragonBallController;
@@ -50,7 +52,7 @@ Route::get('/products/{link}', [ProductsController::class, 'show'])->name('produ
 // Ninja
 Route::get('/ninjas', [NinjaController::class, 'index'])->name('ninjas.index');
 Route::get('/ninjas/{code}', [NinjaController::class, 'show'])->name('ninjas.show');
-Route::get('/ninja-coin/prices', [NinjaCoinTransactionsController::class, 'prices'])
+Route::get('/ninja-coins/prices', [NinjaCoinTransactionsController::class, 'prices'])
     ->name('ninja-coin.prices');
 Route::get('/carrot/prices', [CarrotTransactionsController::class, 'prices'])
     ->name('carrot.prices');
@@ -63,6 +65,11 @@ Route::get('/dragon-balls/{code}', [DragonBallController::class, 'show']);
 
 // settings
 Route::get('/notification', [SettingsController::class, 'notification'])->name('settings.notification');
+// topics
+Route::get('/topics', [TopicController::class, 'index']);
+Route::get('/topics/{slug}', [TopicController::class, 'show']);
+
+
 // user
 Route::group(['middleware' => 'is_user'], function () {
     Route::get('/user', [UserController::class, 'user'])->name('user');
@@ -70,25 +77,22 @@ Route::group(['middleware' => 'is_user'], function () {
     Route::get('/account-purchases', [AccountPurchaseController::class, 'index']);
     Route::get('/account-purchases/{id}', [AccountPurchaseController::class, 'show']);
     Route::prefix('top-up')->name('top-up.')->group(function () {
-        Route::prefix('transactions')->name('transactions.')->group(function () {
-            Route::get('/bank', [TopUpTransactionsController::class, 'index'])->name('bank.index');
-            Route::post('/bank', [TopUpTransactionsController::class, 'store'])->name('bank.store');
+        Route::prefix('bank')->name('bank.')->group(function () {
+            Route::get('/', [TopUpTransactionsController::class, 'index'])->name('index');
+            Route::post('/', [TopUpTransactionsController::class, 'store'])->name('store');
         });
     });
     Route::prefix('account')->name('top-up.')->group(function () {
         Route::get('/transactions', [WalletTransactionController::class, 'index'])->name('account.transactions');
     });
-    Route::prefix('/ninja-coin')->name('ninja-coin.')->group(function () {
-        Route::post('/buy', [NinjaCoinTransactionsController::class, 'store'])
-            ->name('store');
-        Route::get('/histories', [NinjaCoinTransactionsController::class, 'index'])
-            ->name('histories');
+    Route::prefix('/ninja-coins')->name('ninja-coins.')->group(function () {
+        Route::get('/', [NinjaCoinTransactionsController::class, 'index'])->name('index');
+        Route::post('/purchase', [NinjaCoinTransactionsController::class, 'purchase'])->name('purchase');
     });
-    Route::prefix('/carrot')->name('carrot.')->group(function () {
-        Route::post('/topup', [CarrotTransactionsController::class, 'store'])
-            ->name('store');
-        Route::get('/histories', [CarrotTransactionsController::class, 'index'])
-            ->name('histories');
+    Route::prefix('/carrots')->name('carrots.')->group(function () {
+        Route::get('/', [CarrotTransactionsController::class, 'index'])->name('index');
+        Route::post('/topup', [CarrotTransactionsController::class, 'store'])->name('topup');
+        Route::get('/prices', [CarrotTransactionsController::class, 'prices'])->name('prices');
     });
 });
 
@@ -104,6 +108,15 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
     Route::get('/products', [AdminProductsController::class, 'index'])->name('admin.products.index');
     Route::post('/products', [AdminProductsController::class, 'modify'])->name('admin.products.modify');
     Route::get('/products/{id}', [AdminProductsController::class, 'show'])->name('admin.products.show');
+
+    // Admin topics
+    Route::prefix('topics')->group(function () {
+        Route::get('/', [AdminTopicController::class, 'index']);
+        Route::post('modify', [AdminTopicController::class, 'modify']);
+        Route::get('{id}', [AdminTopicController::class, 'show']);
+        Route::post('destroy', [AdminTopicController::class, 'destroy']);
+        Route::post('restore', [AdminTopicController::class, 'restore']);
+    });
 
     Route::get('/folders', [FolderController::class, 'index'])->name('admin.folders.index');
     Route::post('/folders/create', [FolderController::class, 'create'])->name('admin.folders.create');

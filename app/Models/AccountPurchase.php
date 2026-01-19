@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Ninja;
 use App\Models\Avatar;
+use App\Models\DragonBall;
 use App\Traits\HidesTimestamps;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,11 +19,13 @@ class AccountPurchase extends Model
         'user_id',
         'images',
         'note',
-        'purchase_price'
+        'purchase_price',
+        'account_id',
     ];
     protected $fillable = [
         'account_type',
         'account_code',
+        'account_id',
         'user_id',
         'selling_price',
         'purchase_price',
@@ -57,6 +60,10 @@ class AccountPurchase extends Model
             'avatar' => [
                 'model' => Avatar::class,
                 'fields' => ['code', 'username', 'password', 'transfer_pin'],
+            ],
+            'dragon_ball' => [
+                'model' => DragonBall::class,
+                'fields' => ['code', 'username', 'password'],
             ],
         ];
 

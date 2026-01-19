@@ -7,8 +7,10 @@ use App\Models\CarrotTransaction;
 use App\Models\CarrotPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use App\Models\WalletTransaction;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\AdminPurchaseCarrotNotification;
 
 class CarrotTransactionsController extends Controller
 {
@@ -51,7 +53,6 @@ class CarrotTransactionsController extends Controller
             'amount'    => 'required|integer|min:50000',
         ]);
 
-        /** @var User $user */
         $user = $request->user();
 
         try {
@@ -100,32 +101,46 @@ class CarrotTransactionsController extends Controller
             ]);
 
             // 📒 Ghi lịch sử ví
-            $walletConfig = config('transactions.types.purchase');
-
+            $walletConfig = config('transactions.types.purchase_carrot');
             WalletTransaction::create([
                 'user_id'        => $user->id,
-                'type'           => 'purchase',
+                'type'           => 'purchase_carrot',
                 'reference_type' => CarrotTransaction::class,
                 'reference_id'   => $carrotTransaction->id,
-                'direction'      => $walletConfig['type'], // out
+                'direction'      => $walletConfig['direction'], // out
                 'amount'         => $price,
                 'balance_before' => $balanceBefore,
                 'balance_after'  => $user->cash,
-                'description'    => $walletConfig['content']  . " Carrot #{$carrotTransaction->id}",
+                'description'    => $walletConfig['content'] . " #{$carrotTransaction->id}",
             ]);
 
             DB::commit();
 
-            return response()->json([
-                'message' => 'Thành công',
-                'data'    => $carrotTransaction,
-            ]);
+            try {
+                Mail::to(config('mail.admin_email'))
+                    ->queue(new AdminPurchaseCarrotNotification(
+                        $user,
+                        $carrotTransaction
+                    ));
+            } catch (\Throwable $e) {
+                Log::error('Send admin purchase carrot mail failed', [
+                    'user_id' => $user->id,
+                    'carrot_transaction_id' => $carrotTransaction->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            return fetchData($carrotTransaction->refresh());
         } catch (\Exception $e) {
             DB::rollBack();
 
+            Log::error('Purchase carrot failed', [
+                'user_id' => $user->id ?? null,
+                'error'   => $e->getMessage(),
+            ]);
+
             return response()->json([
                 'message' => 'Thất bại',
-                'error'   => $e->getMessage(),
             ], 500);
         }
     }

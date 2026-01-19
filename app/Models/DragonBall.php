@@ -2,25 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Http\Request;
-use App\Traits\HidesTimestamps;
-use App\Traits\Account\AccountRelations;
-use App\Traits\Account\AccountAttributes;
+use App\Models\Base\BaseGameAccountModel;
 
-class DragonBall extends Model
+
+class DragonBall extends BaseGameAccountModel
 {
-    use HasFactory;
-    use SoftDeletes;
-    use HidesTimestamps;
-    use AccountRelations;
-    use AccountAttributes;
-
-    protected $table = 'dragon_balls';
-
-    protected $appends = ['active_discount', 'price', 'account_type'];
+    protected $hidden = [
+        'id',
+        'username',
+        'is_sold',
+        'purchase_price',
+        'password'
+    ];
 
     protected $casts = [
         'images' => 'array',
@@ -32,83 +25,14 @@ class DragonBall extends Model
         'discount_percent' => 'decimal:0',
     ];
 
-    /**
-     * Default attributes.
-     */
-    protected $attributes = [
-        'is_sold' => false,
-    ];
-
-    /* =====================
-     |  Scopes (optional)
-     ===================== */
-
-    public function scopeAvailable($query)
+    protected function filterableFields(): array
     {
-        return $query->where('is_sold', false);
-    }
-
-    public function scopeSold($query)
-    {
-        return $query->where('is_sold', true);
-    }
-
-    /**
-     * Scope a query to search
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeSearch($query, Request $request)
-    {
-        $input = json_decode($request->input('input', '{}'));
-        $search = $input->q ?? null;
-        // return $search;
-        if (empty($search)) {
-            return $query;
-        }
-
-        return $query->where(function ($q) use ($search) {
-            if (!empty($search->code)) {
-                $q->where('code', $search->code);
-            }
-
-
-            if (!empty($search->cash)) {
-                if (isset($search->cash->min)) {
-                    $q->where('selling_price', '>=', $search->cash->min);
-                }
-
-                if (isset($search->cash->max)) {
-                    $q->where('selling_price', '<=', $search->cash->max);
-                }
-            }
-
-            if (!empty($search->planet)) {
-                $q->where('planet', 'like', "%{$search->planet}%");
-            }
-
-            if (!empty($search->server)) {
-                $q->where('server', 'like', "%{$search->server}%");
-            }
-
-            if (!empty($search->username)) {
-                $q->where('username', 'like', "%{$search->username}%");
-            }
-
-            if (!empty($search->ingame)) {
-                $q->where('character_name', 'like', "%{$search->ingame}%");
-            }
-
-            if (!empty($search->family)) {
-                $q->where('is_family', $search->family);
-            }
-        });
-    }
-
-    public function getAccountTypeAttribute()
-    {
-        return 'dragon_ball';
+        return [
+            'code' => ['code', 'like'],
+            'planet' => ['planet'],
+            'server' => ['server'],
+            'username' => ['username', 'like'],
+            'cash' => ['selling_price', 'range'],
+        ];
     }
 }

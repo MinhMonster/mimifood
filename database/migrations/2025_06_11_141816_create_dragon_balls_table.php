@@ -20,8 +20,8 @@ class CreateDragonBallsTable extends Migration
             $table->string('password')->nullable();
 
             // Stats
-            $table->bigInteger('strength')->nullable();
-            $table->bigInteger('disciple')->nullable();
+            $table->string('strength')->nullable();
+            $table->string('disciple')->nullable();
             $table->json('images')->nullable();
 
             // Prices

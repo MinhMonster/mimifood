@@ -27,6 +27,7 @@ class AccountPurchase extends Model
     protected $fillable = [
         'account_type',
         'account_code',
+        'account_id',
         'user_id',
         'purchase_price',
         'selling_price',

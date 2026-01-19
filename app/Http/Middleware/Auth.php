@@ -5,34 +5,33 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Exception;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class Auth
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
-     */
     public function handle(Request $request, Closure $next)
     {
         try {
-            $user = JWTAuth::parseToken()->authenticate();
-        } catch (Exception $e) {
-            if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
-
-                return response()->json(
-                    ['status' => 'Token is invalid'],
-                    401
-                );
-            } else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
-                return response()->json(['status' => 'Token is expired'], 401);
-            } else {
-                return response()->json(['status' => 'Authorization Token not found'], 400);
-            }
+            JWTAuth::parseToken()->authenticate();
+        } catch (TokenExpiredException $e) {
+            return response()->json([
+                'code'    => 'TOKEN_EXPIRED',
+                'message' => 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại'
+            ], 401);
+        } catch (TokenInvalidException $e) {
+            return response()->json([
+                'code'    => 'TOKEN_INVALID',
+                'message' => 'Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại'
+            ], 401);
+        } catch (JWTException $e) {
+            return response()->json([
+                'code'    => 'UNAUTHENTICATED',
+                'message' => 'Bạn chưa đăng nhập'
+            ], 401);
         }
+
         return $next($request);
     }
 }

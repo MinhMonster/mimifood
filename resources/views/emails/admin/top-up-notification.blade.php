@@ -7,7 +7,6 @@
 
 <p><strong>Mã giao dịch:</strong> #{{ $transaction->id }}</p>
 <p><strong>Số tiền:</strong> {{ number_format($transaction->amount) }} VND</p>
-<p><strong>Trạng thái:</strong> {{ strtoupper($transaction->status) }}</p>
 <p><strong>Ghi chú:</strong> {{ $transaction->note ?? '—' }}</p>
 <p><strong>Thời gian:</strong> {{ $transaction->transaction_at }}</p>
 

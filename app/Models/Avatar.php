@@ -2,24 +2,10 @@
 
 namespace App\Models;
 
-use App\Traits\HidesTimestamps;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Http\Request;
-use App\Traits\Account\AccountRelations;
-use App\Traits\Account\AccountAttributes;
+use App\Models\Base\BaseGameAccountModel;
 
-class Avatar extends Model
+class Avatar extends BaseGameAccountModel
 {
-    use HasFactory;
-    use SoftDeletes;
-    use HidesTimestamps;
-    use AccountRelations;
-    use AccountAttributes;
-
-    protected $appends = ['active_discount', 'price', 'account_type'];
-
     protected $fillable = [
         'username',
         'description',
@@ -35,43 +21,26 @@ class Avatar extends Model
     ];
 
     protected $hidden = [
+        'id',
         'is_sold',
-        'transfer_pin'
+        'transfer_pin',
+        'purchase_price',
+        'password'
     ];
 
     protected $casts = [
         'images' => 'array',
+        'is_full_image' => 'boolean',
     ];
 
-    /**
-     * Scope a query to search avatars by id, username.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeSearch($query, Request $request)
+    protected function filterableFields(): array
     {
-        $input = json_decode($request->input('input', '{}'));
-        $search = $input->q;
-
-        if (empty((array) $search)) {
-            return $query;
-        }
-
-        return $query->where(function ($q) use ($search) {
-            if (!empty($search->code)) {
-                $q->where('code', $search->code);
-            }
-
-            if (!empty($search->username)) {
-                $q->where('username', 'like', "%{$search->username}%");
-            }
-        });
-    }
-
-    public function getAccountTypeAttribute()
-    {
-        return 'avatar';
+        return [
+            'code' => ['code', 'like'],
+            'username' => ['username', 'like'],
+            'land' => ['land', 'range'],
+            'cash' => ['selling_price', 'range'],
+            'sex' => ['sex'],
+        ];
     }
 }

@@ -81,18 +81,18 @@ class CarrotTransactionController extends Controller
                 $user->cash += $price;
                 $user->save();
 
-                $transaction = config("transactions.types.refund");
+                $walletConfig = config("transactions.types.refund_carrot");
 
                 WalletTransaction::create([
                     'user_id'        => $userId,
-                    'type'           => 'refund',
+                    'type'           => 'refund_carrot',
                     'reference_type' => CarrotTransaction::class,
                     'reference_id'   => $carrotTransaction->id,
-                    'direction'      => $transaction['type'],
+                    'direction'      => $walletConfig['direction'],
                     'amount'         => $price,
                     'balance_before' => $balanceBefore,
                     'balance_after'  => $user->cash,
-                    'description'    => $transaction['content'] . " Carrot #{$carrotTransaction->id}",
+                    'description'    => $walletConfig['content'] . " #{$carrotTransaction->id}",
                 ]);
 
                 DB::commit();

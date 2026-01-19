@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Database\Eloquent\Builder;
 
 if (!function_exists('format_date')) {
     function format_date($date, $format = 'Y-m-d H:i:s')
@@ -89,7 +90,11 @@ if (!function_exists('formatPaginate')) {
         array $hidden = [],
         array $sumColumns = []
     ) {
-        $input = json_decode($request['input'] ?? '{}');
+        if (isset($request['input'])) {
+            $input = json_decode($request['input'] ?? '{}');
+        } else {
+            $input = $request;
+        }
 
         $pagination = (clone $query)
             ->orderBy('id', 'desc')
@@ -169,5 +174,46 @@ if (! function_exists('buildFolderPath')) {
         $fullPath = preg_replace('#/+#', '/', $fullPath);
 
         return $fullPath;
+    }
+}
+
+if (!function_exists('apply_range_filter')) {
+    /**
+     * Apply range filter from string value: "min-max" | "min"
+     *
+     * @param  Builder $query
+     * @param  string  $column
+     * @param  mixed   $value
+     * @return void
+     */
+    function apply_range_filter(Builder $query, string $column, $value): void
+    {
+        if ($value === null || $value === '') {
+            return;
+        }
+
+        // "min-max"
+        if (is_string($value) && str_contains($value, '-')) {
+            [$min, $max] = array_pad(
+                array_map('intval', explode('-', $value, 2)),
+                2,
+                null
+            );
+
+            if ($min !== null && $max !== null) {
+                $query->whereBetween($column, [$min, $max]);
+            } elseif ($min !== null) {
+                $query->where($column, '>=', $min);
+            } elseif ($max !== null) {
+                $query->where($column, '<=', $max);
+            }
+
+            return;
+        }
+
+        // "min"  (>= min)
+        if (is_numeric($value)) {
+            $query->where($column, '>=', (int) $value);
+        }
     }
 }

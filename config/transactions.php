@@ -16,15 +16,35 @@ return [
             'direction'  => 'in',
             'content' => 'Nạp tiền vào ví',
         ],
-        'purchase' => [
-            'label' => 'Thanh toán đơn hàng',
+        'purchase_account' => [
+            'label' => 'Thanh toán đơn hàng mua nick',
             'direction'  => 'out',
-            'content' => 'Thanh toán cho đơn hàng',
+            'content' => 'Thanh toán cho đơn hàng mua nick',
+        ],
+        'purchase_carrot' => [
+            'label' => 'Thanh toán đơn hàng Carrot',
+            'direction'  => 'out',
+            'content' => 'Thanh toán cho đơn hàng nạp Carrot',
+        ],
+        'purchase_ninja_coin' => [
+            'label' => 'Thanh toán đơn hàng mua xu ninja',
+            'direction'  => 'out',
+            'content' => 'Thanh toán cho đơn hàng mua xu ninja',
         ],
         'refund' => [
-            'label' => 'Hoàn tiền',
+            'label' => 'Hoàn tiền mua nick',
             'direction'  => 'in',
-            'content' => 'Hoàn tiền cho đơn hàng',
+            'content' => 'Hoàn tiền cho đơn hàng mua nick',
+        ],
+        'refund_carrot' => [
+            'label' => 'Hoàn tiền nạp  Carrot',
+            'direction'  => 'in',
+            'content' => 'Hoàn tiền cho đơn hàng nạp Carrot',
+        ],
+        'refund_ninja_coin' => [
+            'label' => 'Hoàn tiền nạp mua xu ninja',
+            'direction'  => 'in',
+            'content' => 'Hoàn tiền cho đơn hàng mua xu ninja',
         ],
         'admin_adjust_increase' => [
             'label' => 'Điều chỉnh tăng',

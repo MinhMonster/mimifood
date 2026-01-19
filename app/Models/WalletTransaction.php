@@ -13,7 +13,7 @@ class WalletTransaction extends Model
         'updated_at'    => 'datetime:Y-m-d H:i:s',
     ];
 
-    protected $appends = ['reference'];
+    // protected $appends = ['reference'];
 
     protected $hidden = ['user_id', 'updated_at', 'reference_type', 'reference_id'];
 
@@ -55,8 +55,13 @@ class WalletTransaction extends Model
 
     public function getDescriptionAttribute()
     {
-        if ($this->type === "purchase") {
-            return config("transactions.types.purchase.content");
+        if ($this->type) {
+            $content = config("transactions.types.{$this->type}.content");
+            if ($this->reference_id) {
+                return $content . " #{$this->reference_id}";
+            }
+            return $content;
+
             // return $config['content'] . ": " . (is_array($this->meta) ? $this->meta['id'] ?? null : null);
         }
         return $this->attributes['description'];
