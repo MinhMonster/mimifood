@@ -13,7 +13,7 @@ class WalletTransaction extends Model
         'updated_at'    => 'datetime:Y-m-d H:i:s',
     ];
 
-    protected $appends = ['reference'];
+    // protected $appends = ['reference'];
 
     protected $hidden = ['user_id', 'updated_at', 'reference_type', 'reference_id'];
 

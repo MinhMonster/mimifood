@@ -89,7 +89,11 @@ if (!function_exists('formatPaginate')) {
         array $hidden = [],
         array $sumColumns = []
     ) {
-        $input = json_decode($request['input'] ?? '{}');
+        if (isset($request['input'])) {
+            $input = json_decode($request['input'] ?? '{}');
+        } else {
+            $input = $request;
+        }
 
         $pagination = (clone $query)
             ->orderBy('id', 'desc')
