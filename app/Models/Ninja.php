@@ -23,7 +23,8 @@ class Ninja extends Model
         'id',
         'username',
         'is_sold',
-        'transfer_pin'
+        'transfer_pin',
+        'purchase_price'
     ];
 
     protected $casts = [

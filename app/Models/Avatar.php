@@ -35,8 +35,11 @@ class Avatar extends Model
     ];
 
     protected $hidden = [
+        'id',
         'is_sold',
-        'transfer_pin'
+        'transfer_pin',
+        'purchase_price',
+        'password'
     ];
 
     protected $casts = [
@@ -52,8 +55,7 @@ class Avatar extends Model
      */
     public function scopeSearch($query, Request $request)
     {
-        $input = json_decode($request->input('input', '{}'));
-        $search = $input->q;
+        $search = $request;
 
         if (empty((array) $search)) {
             return $query;

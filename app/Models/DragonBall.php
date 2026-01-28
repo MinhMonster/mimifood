@@ -22,6 +22,14 @@ class DragonBall extends Model
 
     protected $appends = ['active_discount', 'price', 'account_type'];
 
+    protected $hidden = [
+        'id',
+        'username',
+        'is_sold',
+        'transfer_pin',
+        'purchase_price'
+    ];
+
     protected $casts = [
         'images' => 'array',
         'is_sold' => 'boolean',
