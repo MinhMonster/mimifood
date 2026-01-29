@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\HidesTimestamps;
 use App\Traits\Account\AccountRelations;
 use App\Traits\Account\AccountAttributes;
+use App\Traits\HasThumbnail;
 
 class Ninja extends Model
 {
@@ -17,8 +18,9 @@ class Ninja extends Model
     use HidesTimestamps;
     use AccountRelations;
     use AccountAttributes;
+    use HasThumbnail;
 
-    protected $appends = ['active_discount', 'price', 'account_type'];
+    protected $appends = ['active_discount', 'price', 'account_type', 'thumbnail'];
     protected $hidden = [
         'id',
         'username',

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Traits\HidesTimestamps;
 use App\Traits\Account\AccountRelations;
 use App\Traits\Account\AccountAttributes;
+use App\Traits\HasThumbnail;
 
 class DragonBall extends Model
 {
@@ -17,10 +18,11 @@ class DragonBall extends Model
     use HidesTimestamps;
     use AccountRelations;
     use AccountAttributes;
+    use HasThumbnail;
 
     protected $table = 'dragon_balls';
 
-    protected $appends = ['active_discount', 'price', 'account_type'];
+    protected $appends = ['active_discount', 'price', 'account_type', 'thumbnail'];
 
     protected $hidden = [
         'id',
