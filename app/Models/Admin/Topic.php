@@ -4,12 +4,16 @@ namespace App\Models\Admin;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\HasThumbnail;
 
 class Topic extends Model
 {
     use SoftDeletes;
+    use HasThumbnail;
 
     protected $table = 'topics';
+
+    protected $appends = ['thumbnail'];
 
     protected $fillable = [
         'id',
@@ -38,6 +42,8 @@ class Topic extends Model
     {
         if ($request->keyword) {
             $query->where('title', 'like', '%' . $request->keyword . '%');
+            $query->orWhere('content', 'like', '%' . $request->keyword . '%');
+            $query->orWhere('description', 'like', '%' . $request->keyword . '%');
         }
 
         if ($request->is_active !== null) {

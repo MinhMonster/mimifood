@@ -117,7 +117,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
         Route::get('/', [AdminTopicController::class, 'index']);
         Route::post('modify', [AdminTopicController::class, 'modify']);
         Route::get('{id}', [AdminTopicController::class, 'show']);
-        Route::delete('destroy', [AdminTopicController::class, 'destroy']);
+        Route::post('destroy', [AdminTopicController::class, 'destroy']);
         Route::post('restore', [AdminTopicController::class, 'restore']);
     });
 

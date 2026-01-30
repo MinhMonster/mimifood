@@ -16,7 +16,7 @@ class TopicController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Topic::query()
+        $query = Topic::withTrashed()
             ->search($request)
             ->orderByDesc('id');
 
@@ -115,22 +115,22 @@ class TopicController extends Controller
     }
 
     /**
-     * Soft delete topic
+     * Toggle active / inactive topic
      */
     public function destroy(Request $request)
     {
         $topic = Topic::withTrashed()->find($request->id);
 
-        if (!$topic) {
+        if (! $topic) {
             return response()->json([
                 'status'  => 'error',
                 'message' => 'Topic not found',
             ], 404);
         }
 
-        if (! $topic->trashed()) {
-            $topic->delete();
-        }
+        $topic->update([
+            'is_active' => ! $topic->is_active,
+        ]);
 
         return fetchData($topic);
     }
