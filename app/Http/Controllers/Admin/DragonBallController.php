@@ -48,8 +48,8 @@ class DragonBallController extends Controller
             'planet' => 'required|integer',
             'server' => 'required|integer',
             'type' => ['required', Rule::in([1, 2, 3])],
-            'strength' => 'required|integer',
-            'disciple' => 'required|integer',
+            'strength' => 'required|string',
+            'disciple' => 'required|string',
         ]);
 
         if ($validator->fails()) {

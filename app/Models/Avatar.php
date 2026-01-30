@@ -46,10 +46,11 @@ class Avatar extends Model
 
     protected $casts = [
         'images' => 'array',
+        'is_full_image' => 'boolean',
     ];
 
     /**
-     * Scope a query to search avatars by id, username.
+     * Scope search avatars
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Http\Request  $request
@@ -57,21 +58,34 @@ class Avatar extends Model
      */
     public function scopeSearch($query, Request $request)
     {
-        $search = $request;
+        $filters = $request->all();
 
-        if (empty((array) $search)) {
-            return $query;
-        }
-
-        return $query->where(function ($q) use ($search) {
-            if (!empty($search->code)) {
-                $q->where('code', $search->code);
-            }
-
-            if (!empty($search->username)) {
-                $q->where('username', 'like', "%{$search->username}%");
-            }
-        });
+        return $query
+            ->when(
+                $filters['code'] ?? null,
+                fn($q, $v) =>
+                $q->where('code', 'like', "%{$v}%")
+            )
+            ->when(
+                !empty($filters['land']),
+                fn($q) =>
+                apply_range_filter($q, 'land', $filters['land'])
+            )
+            ->when(
+                !empty($filters['cash']),
+                fn($q) =>
+                apply_range_filter($q, 'selling_price', $filters['cash'])
+            )
+            ->when(
+                !empty($filters['sex']),
+                fn($q) =>
+                apply_range_filter($q, 'sex', $filters['sex'])
+            )
+            ->when(
+                $filters['username'] ?? null,
+                fn($q, $v) =>
+                $q->where('username', 'like', "%{$v}%")
+            );
     }
 
     public function getAccountTypeAttribute()

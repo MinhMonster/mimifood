@@ -15,6 +15,8 @@ class Topic extends Model
 
     protected $appends = ['thumbnail'];
 
+    protected $hidden = ["id", "is_active", "sort_order", "view_count", "meta_description", "meta_keywords", "meta_title", "category_id"];
+
     protected $fillable = [
         'title',
         'slug',

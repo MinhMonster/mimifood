@@ -24,6 +24,7 @@ class Ninja extends Model
     protected $hidden = [
         'id',
         'username',
+        'password',
         'is_sold',
         'transfer_pin',
         'purchase_price'
@@ -36,7 +37,7 @@ class Ninja extends Model
     ];
 
     /**
-     * Scope a query to search ninjas by id, username, or character_name.
+     * Scope search ninja accounts
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Http\Request  $request
@@ -44,70 +45,54 @@ class Ninja extends Model
      */
     public function scopeSearch($query, Request $request)
     {
-        $input = json_decode($request->input('input', '{}'));
-        $search = $input->q ?? null;
-        // return $search;
-        if (empty($search)) {
-            return $query;
-        }
+        $filters = $request->all();
 
-        return $query->where(function ($q) use ($search) {
-            if (!empty($search->code)) {
-                $q->where('code', $search->code);
-            }
+        return $query
+            ->when(
+                $filters['code'] ?? null,
+                fn($q, $v) =>
+                $q->where('code', 'like', "%{$v}%")
+            )
 
-            if (!empty($search->type)) {
-                switch ($search->type) {
-                    case "VIP":
-                        $q->where('type', 1);
-                        break;
-                    case "cheap":
-                        $q->where('type', 2);
-                        break;
-                    default:
-                }
-            }
+            ->when(
+                $filters['type'] ?? null,
+                fn($q, $v) =>
+                $q->where('type', $v)
+            )
 
-            if (!empty($search->level)) {
-                if (isset($search->level->min)) {
-                    $q->where('level', '>=', $search->level->min);
-                }
+            ->when(
+                array_key_exists('is_family', $filters),
+                fn($q) =>
+                $q->where('is_family', $filters['is_family'])
+            )
 
-                if (isset($search->level->max)) {
-                    $q->where('level', '<=', $search->level->max);
-                }
-            }
+            ->when(
+                !empty($filters['level']),
+                fn($q) =>
+                apply_range_filter($q, 'level', $filters['level'])
+            )
 
-            if (!empty($search->cash)) {
-                if (isset($search->cash->min)) {
-                    $q->where('selling_price', '>=', $search->cash->min);
-                }
+            ->when(
+                !empty($filters['cash']),
+                fn($q) =>
+                apply_range_filter($q, 'selling_price', $filters['cash'])
+            )
 
-                if (isset($search->cash->max)) {
-                    $q->where('selling_price', '<=', $search->cash->max);
-                }
-            }
-
-            if (!empty($search->class)) {
-                $q->where('class', 'like', "%{$search->class}%");
-            }
-
-            if (!empty($search->server)) {
-                $q->where('server', 'like', "%{$search->server}%");
-            }
-
-            if (!empty($search->username)) {
-                $q->where('username', 'like', "%{$search->username}%");
-            }
-
-            if (!empty($search->ingame)) {
-                $q->where('character_name', 'like', "%{$search->ingame}%");
-            }
-
-            if (!empty($search->family)) {
-                $q->where('is_family', $search->family);
-            }
-        });
+            ->when(
+                $filters['class'] ?? null,
+                fn($q, $v) =>
+                $q->where('class', $v)
+            )
+            ->when(
+                $filters['server'] ?? null,
+                fn($q, $v) =>
+                $q->where('server', $v)
+            )
+            ->when(
+                $filters['character_name'] ?? null,
+                fn($q, $v) =>
+                $q->where('character_name', 'like', "%{$v}%")
+            );
     }
 
     public function getAccountTypeAttribute()

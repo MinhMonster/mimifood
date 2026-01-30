@@ -28,8 +28,8 @@ class DragonBall extends Model
         'id',
         'username',
         'is_sold',
-        'transfer_pin',
-        'purchase_price'
+        'purchase_price',
+        'password'
     ];
 
     protected $casts = [
@@ -72,51 +72,30 @@ class DragonBall extends Model
      */
     public function scopeSearch($query, Request $request)
     {
-        $input = json_decode($request->input('input', '{}'));
-        $search = $input->q ?? null;
-        // return $search;
-        if (empty($search)) {
-            return $query;
-        }
+        $filters = $request->all();
 
-        return $query->where(function ($q) use ($search) {
-            if (!empty($search->code)) {
-                $q->where('code', $search->code);
-            }
-
-
-            if (!empty($search->cash)) {
-                if (isset($search->cash->min)) {
-                    $q->where('selling_price', '>=', $search->cash->min);
-                }
-
-                if (isset($search->cash->max)) {
-                    $q->where('selling_price', '<=', $search->cash->max);
-                }
-            }
-
-            if (!empty($search->planet)) {
-                $q->where('planet', 'like', "%{$search->planet}%");
-            }
-
-            if (!empty($search->server)) {
-                $q->where('server', 'like', "%{$search->server}%");
-            }
-
-            if (!empty($search->username)) {
-                $q->where('username', 'like', "%{$search->username}%");
-            }
-
-            if (!empty($search->ingame)) {
-                $q->where('character_name', 'like', "%{$search->ingame}%");
-            }
-
-            if (!empty($search->family)) {
-                $q->where('is_family', $search->family);
-            }
-        });
+        return $query
+            ->when(
+                $filters['code'] ?? null,
+                fn($q, $v) =>
+                $q->where('code', 'like', "%{$v}%")
+            )
+            ->when(
+                $filters['planet'] ?? null,
+                fn($q, $v) =>
+                $q->where('planet', $v)
+            )
+            ->when(
+                !empty($filters['cash']),
+                fn($q) =>
+                apply_range_filter($q, 'selling_price', $filters['cash'])
+            )
+            ->when(
+                $filters['username'] ?? null,
+                fn($q, $v) =>
+                $q->where('username', 'like', "%{$v}%")
+            );
     }
-
     public function getAccountTypeAttribute()
     {
         return 'dragon_ball';
