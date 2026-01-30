@@ -2,26 +2,10 @@
 
 namespace App\Models;
 
-use App\Traits\HidesTimestamps;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Http\Request;
-use App\Traits\Account\AccountRelations;
-use App\Traits\Account\AccountAttributes;
-use App\Traits\HasThumbnail;
+use App\Models\Base\BaseGameAccountModel;
 
-class Avatar extends Model
+class Avatar extends BaseGameAccountModel
 {
-    use HasFactory;
-    use SoftDeletes;
-    use HidesTimestamps;
-    use AccountRelations;
-    use AccountAttributes;
-    use HasThumbnail;
-
-    protected $appends = ['active_discount', 'price', 'account_type', 'thumbnail'];
-
     protected $fillable = [
         'username',
         'description',
@@ -49,47 +33,14 @@ class Avatar extends Model
         'is_full_image' => 'boolean',
     ];
 
-    /**
-     * Scope search avatars
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeSearch($query, Request $request)
+    protected function filterableFields(): array
     {
-        $filters = $request->all();
-
-        return $query
-            ->when(
-                $filters['code'] ?? null,
-                fn($q, $v) =>
-                $q->where('code', 'like', "%{$v}%")
-            )
-            ->when(
-                !empty($filters['land']),
-                fn($q) =>
-                apply_range_filter($q, 'land', $filters['land'])
-            )
-            ->when(
-                !empty($filters['cash']),
-                fn($q) =>
-                apply_range_filter($q, 'selling_price', $filters['cash'])
-            )
-            ->when(
-                !empty($filters['sex']),
-                fn($q) =>
-                apply_range_filter($q, 'sex', $filters['sex'])
-            )
-            ->when(
-                $filters['username'] ?? null,
-                fn($q, $v) =>
-                $q->where('username', 'like', "%{$v}%")
-            );
-    }
-
-    public function getAccountTypeAttribute()
-    {
-        return 'avatar';
+        return [
+            'code' => ['code', 'like'],
+            'username' => ['username', 'like'],
+            'land' => ['land', 'range'],
+            'cash' => ['selling_price', 'range'],
+            'sex' => ['sex'],
+        ];
     }
 }
