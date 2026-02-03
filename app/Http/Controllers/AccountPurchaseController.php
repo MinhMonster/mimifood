@@ -72,83 +72,103 @@ class AccountPurchaseController extends Controller
         }
 
         try {
-            DB::beginTransaction();
+            $result = DB::transaction(function () use (
+                $accountModel,
+                $accountCode,
+                $user,
+                $userId,
+                $balanceBefore,
+                $accountType
+            ) {
+                // lock account
+                $account = $accountModel::where('code', $accountCode)
+                    ->whereNull('deleted_at')
+                    ->lockForUpdate()
+                    ->first();
+                if (!$account) {
+                    throw new \RuntimeException('Không tìm thấy tài khoản', 404);
+                }
 
+                if ($account->is_sold) {
+                    throw new \RuntimeException('Tài khoản đã bán', 409);
+                }
 
-            $account = $accountModel::where('code', $accountCode)
-                ->whereNull('deleted_at')
-                ->lockForUpdate()
-                ->first();
-            if (!$account) {
-                DB::rollBack();
-                return response()->json(['message' => 'Không tìm thấy tài khoản'], 404);
-            }
+                $price = $account->price ?? $account->selling_price;
 
-            if ($account->is_sold) {
-                DB::rollBack();
-                return response()->json(['message' => 'Tài khoản đã bán'], 409);
-            }
+                if ($balanceBefore < $price) {
+                    throw new \RuntimeException('Số dư không đủ', 402);
+                }
 
-            $price = $account->selling_price ?? $account->price;
+                // update user
+                $user->decrement('cash', $price);
 
-            if ($balanceBefore < $price) {
-                DB::rollBack();
-                return response()->json(['message' => 'Số dư không đủ'], 409);
-            }
-            // update user
-            $user->decrement('cash', $price);
+                // update account
+                $account->is_sold = true;
+                $account->save();
 
-            // update account
-            $account->is_sold = true;
-            $account->save();
+                // create history buy account
+                $accountPurchase = AccountPurchase::create([
+                    'account_type' => $accountType,
+                    'account_code' => $account->code,
+                    'account_id' => $account->id,
+                    'user_id' => $userId,
+                    'selling_price' => $price,
+                    'purchase_price' => $account->purchase_price,
+                ]);
 
-            // create history buy account
-            $accountPurchase = AccountPurchase::create([
-                'account_type' => $accountType,
-                'account_code' => $account->code,
-                'account_id' => $account->id,
-                'user_id' => $userId,
-                'selling_price' => $price,
-                'purchase_price' => $account->purchase_price,
-            ]);
+                $transaction = config('transactions.types.purchase_account');
 
-            $transaction = config("transactions.types.purchase_account");
+                // create wallet transaction (lỗi là rollback tất)
+                WalletTransaction::create([
+                    'user_id'        => $userId,
+                    'type'           => 'purchase_account',
+                    'reference_type' => AccountPurchase::class,
+                    'reference_id'   => $accountPurchase->id,
+                    'direction'      => $transaction['direction'],
+                    'amount'         => $price,
+                    'balance_before' => $balanceBefore,
+                    'balance_after'  => $user->cash,
+                    'description'    => $transaction['content'] . " #{$accountPurchase->id}",
+                ]);
 
-            WalletTransaction::create([
-                'user_id'        => $userId,
-                'type'           => 'purchase_account',
-                'reference_type' => AccountPurchase::class,
-                'reference_id'   => $accountPurchase->id,
-                'direction'      => $transaction['direction'],
-                'amount'         => $price,
-                'balance_before' => $balanceBefore,
-                'balance_after'  => $user->cash,
-                'description'    => $transaction['content'] . " #{$accountPurchase->id}",
-            ]);
+                return [
+                    'account'          => $account,
+                    'accountPurchase'  => $accountPurchase,
+                ];
+            });
 
-            DB::commit();
-
+            // gửi mail SAU transaction (không ảnh hưởng rollback)
             try {
                 Mail::to(config('mail.admin_email'))
-                    ->queue(new AdminPurchaseNotification($user, $account, $accountPurchase));
+                    ->queue(new AdminPurchaseNotification(
+                        $user,
+                        $result['account'],
+                        $result['accountPurchase']
+                    ));
             } catch (\Throwable $e) {
                 Log::error('Send admin purchase mail failed', [
-                    'user_id' => $user->id,
-                    'account_code' => $accountPurchase->account_code,
-                    'error' => $e->getMessage(),
+                    'user_id'      => $user->id,
+                    'account_code' => $result['accountPurchase']->account_code,
+                    'error'        => $e->getMessage(),
                 ]);
             }
 
             return response()->json([
                 'message' => 'Mua tài khoản thành công',
-                'data' => $accountPurchase,
+                'data'    => $result['accountPurchase'],
             ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], $e->getCode() ?: 400);
+        } catch (\Throwable $e) {
+            Log::error('Purchase account failed', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
 
             return response()->json([
                 'message' => 'Đã xảy ra lỗi trong quá trình mua, vui lòng thử lại',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }

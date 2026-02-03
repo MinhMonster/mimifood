@@ -36,6 +36,13 @@ class AccountPurchase extends Model
         'created_at',
     ];
 
+    protected $casts = [
+        'images' => 'array',
+    ];
+
+    protected $attributes = [
+        'images' => [],
+    ];
     /**
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query

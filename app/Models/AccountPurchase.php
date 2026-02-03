@@ -38,7 +38,7 @@ class AccountPurchase extends Model
     ];
 
     protected $attributes = [
-        'images' => '[]',
+        'images' => null,
     ];
 
     public function getPurchasedAtAttribute()

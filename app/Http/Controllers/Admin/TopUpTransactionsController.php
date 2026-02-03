@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin\TopUpTransactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\WalletTransaction;
 
 class TopUpTransactionsController extends Controller
 {
@@ -23,7 +24,7 @@ class TopUpTransactionsController extends Controller
             'confirm' => 'required|boolean',
         ]);
 
-        $transaction = TopUpTransactions::findOrFail($validated['id']);
+        $transaction = TopUpTransactions::with('user')->findOrFail($validated['id']);
 
         if ($transaction->status !== 'pending') {
             return response()->json([
@@ -31,21 +32,41 @@ class TopUpTransactionsController extends Controller
             ], 400);
         }
 
-        DB::beginTransaction();
         try {
-            if ($validated['confirm']) {
-                $transaction->status = 'success';
-                $transaction->save();
-                // update cash user
-                $user = $transaction->user;
-                $user->cash += $transaction->amount;
-                $user->save();
-            } else {
-                $transaction->status = 'failed';
-                $transaction->save();
-            }
+            DB::transaction(function () use ($validated, $transaction) {
 
-            DB::commit();
+                if ($validated['confirm']) {
+
+                    $user = $transaction->user;
+                    $balanceBefore = $user->cash;
+
+                    // 1. update topup status
+                    $transaction->status = 'success';
+                    $transaction->save();
+
+                    // 2. update user cash
+                    $user->increment('cash', $transaction->amount);
+
+                    $walletConfig = config('transactions.types.top_up');
+
+                    // 3. create wallet transaction (IN)
+                    WalletTransaction::create([
+                        'user_id'        => $user->id,
+                        'type'           => 'top_up',
+                        'reference_type' => TopUpTransactions::class,
+                        'reference_id'   => $transaction->id,
+                        'direction'      => $walletConfig['direction'], // in
+                        'amount'         => $transaction->amount,
+                        'balance_before' => $balanceBefore,
+                        'balance_after'  => $balanceBefore + $transaction->amount,
+                        'description'    => $walletConfig['content'] . " #{$transaction->id}",
+                    ]);
+                } else {
+                    // reject topup
+                    $transaction->status = 'failed';
+                    $transaction->save();
+                }
+            });
 
             return response()->json([
                 'message' => 'Success',
