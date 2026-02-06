@@ -92,6 +92,9 @@ class AccountPurchase extends Model
             case 'avatar':
                 $model = Avatar::query()->select('id', 'code', 'username', 'password', 'transfer_pin');
                 break;
+            case 'dragon_ball':
+                $model = DragonBall::query()->select('id', 'code', 'username', 'password');
+                break;
             default:
                 $model = null;
                 break;
