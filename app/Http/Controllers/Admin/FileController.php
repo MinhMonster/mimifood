@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use App\Models\File;
 use App\Models\Folder;
 
@@ -33,45 +35,59 @@ class FileController extends Controller
             ? 'main_domain'
             : 'public';
 
-        $folder = ($request->folder_id && $request->folder_id !== "null")
+        $folder = ($request->folder_id && $request->folder_id !== 'null')
             ? Folder::find($request->folder_id)
             : null;
 
         if ($request->folder_id && !$folder) {
             return response()->json(['message' => 'Folder không tồn tại'], 422);
         }
+
         $folderPath = buildFolderPath($folder ? $folder->path : null);
 
         if (!$disk->exists($folderPath)) {
             $disk->makeDirectory($folderPath);
         }
 
-        foreach ($request->file('files') as $file) {
-            $fileName = $file->getClientOriginalName();
+        DB::beginTransaction();
 
-            // Tránh trùng file: nếu tồn tại → thêm timestamp
-            if ($disk->exists($folderPath . $fileName)) {
-                $name = pathinfo($fileName, PATHINFO_FILENAME);
-                $extension = $file->getClientOriginalExtension();
-                $fileName = $name . '-' . time() . '.' . $extension;
+        try {
+            foreach ($request->file('files') as $file) {
+                $fileName = $file->getClientOriginalName();
+                if ($disk->exists($folderPath . $fileName)) {
+                    $name = pathinfo($fileName, PATHINFO_FILENAME);
+                    $extension = $file->getClientOriginalExtension();
+                    $fileName = $name . '-' . Str::uuid() . '.' . $extension;
+                }
+
+                // Lưu file
+                $disk->putFileAs($folderPath, $file, $fileName);
+
+                File::create([
+                    'name'       => $fileName,
+                    'size'       => $file->getSize(),
+                    'mime_type'  => $file->getClientMimeType(),
+                    'folder_id' => $folder->id ?? null,
+                    'disk'       => $diskUsed,
+                ]);
             }
 
-            $fileSize = $file->getSize();
-            $fileMimeType = $file->getClientMimeType();
-            // Lưu file vào disk
-            $disk->putFileAs($folderPath, $file, $fileName);
+            DB::commit();
 
-            // Tạo record trong DB
-            File::create([
-                'name' => $fileName,
-                'size' => $fileSize,
-                'mime_type' => $fileMimeType,
-                'folder_id' => $folder->id ?? null,
-                'disk' => $diskUsed,
+            return response()->json(['message' => 'File uploaded successfully']);
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            // optional: log lỗi
+            logger()->error('Upload failed', [
+                'error' => $e->getMessage(),
             ]);
-        }
 
-        return response()->json(['message' => 'File uploaded successfully']);
+            return response()->json([
+                'message' => 'Upload file thất bại',
+            ], 500);
+        }
     }
 
     public function delete(Request $request)
