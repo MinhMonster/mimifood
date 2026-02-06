@@ -13,7 +13,7 @@ class NinjaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Ninja::query()->search($request)->orderByDesc('code');
+        $query = Ninja::query()->filter()->orderByDesc('code');
 
         return formatPaginate(
             $query,
@@ -144,54 +144,24 @@ class NinjaController extends Controller
     }
 
 
-    /**
-     * Soft delete a ninja.
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy(Request $request)
+    public function destroy(Ninja $account)
     {
-        $id = $request->id;
-        $ninja = Ninja::withTrashed()->find($id);
-
-        if (! $ninja) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Ninja not found',
-            ], 404);
+        if ($account->trashed()) {
+            return fetchData($account);
         }
 
-        if (! $ninja->trashed()) {
-            $ninja->delete();
-        }
+        $account->delete();
 
-        return fetchData($ninja);
+        return fetchData($account);
     }
-
-
-    /**
-     * Restore (un-delete) a ninja.
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function restore(Request $request)
+    public function restore(Ninja $account)
     {
-        $id = $request->id;
-        $ninja = Ninja::withTrashed()->find($id);
-
-        if (! $ninja) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Ninja not found',
-            ], 404);
+        if (! $account->trashed()) {
+            return fetchData($account);
         }
 
-        if ($ninja->trashed()) {
-            $ninja->restore();
-        }
+        $account->restore();
 
-        return fetchData($ninja);
+        return fetchData($account);
     }
 }

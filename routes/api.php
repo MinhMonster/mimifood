@@ -128,8 +128,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
         // Admin Ninja
         Route::get('/ninjas', [AdminNinjaController::class, 'index'])->name('admin.ninjas.index');
         Route::post('/ninjas/modify', [AdminNinjaController::class, 'modify'])->name('admin.ninjas.modify');
-        Route::post('/ninjas/destroy', [AdminNinjaController::class, 'destroy'])->name('admin.ninjas.destroy');
-        Route::post('/ninjas/restore', [AdminNinjaController::class, 'restore'])->name('admin.ninjas.restore');
+        Route::post('/ninjas/{account}/destroy', [AdminNinjaController::class, 'destroy'])->withTrashed()->name('admin.ninjas.destroy');
+        Route::post('/ninjas/{account}/restore', [AdminNinjaController::class, 'restore'])->withTrashed()->name('admin.ninjas.restore');
         Route::get('/ninjas/{id}', [AdminNinjaController::class, 'show'])->name('admin.ninjas.show');
         // Admin Avatar
         Route::get('/avatars', [AdminAvatarController::class, 'index'])->name('admin.avatars.index');
