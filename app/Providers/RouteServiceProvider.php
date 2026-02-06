@@ -13,50 +13,67 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * The path to the "home" route for your application.
      *
-     * This is used by Laravel authentication to redirect users after login.
-     *
      * @var string
      */
     public const HOME = '/home';
 
-    /**
-     * The controller namespace for the application.
-     *
-     * When present, controller route declarations will automatically be prefixed with this namespace.
-     *
-     * @var string|null
-     */
-    // protected $namespace = 'App\\Http\\Controllers';
-
-    /**
-     * Define your route model bindings, pattern filters, etc.
-     *
-     * @return void
-     */
     public function boot()
     {
         $this->configureRateLimiting();
 
+        /**
+         * =========================
+         * Admin Game CRUD Route Macro
+         * =========================
+         */
+        Route::macro('adminGameCrud', function (
+            string $prefix,
+            string $controller,
+            string $namePrefix = null
+        ) {
+            $namePrefix ??= 'admin.' . str_replace('-', '.', $prefix) . '.';
+
+            Route::prefix($prefix)
+                ->name($namePrefix)
+                ->controller($controller)
+                ->group(function () {
+                    Route::get('/', 'index')->name('index');
+                    Route::get('{id}', 'show')->name('show');
+
+                    // create + update (gộp)
+                    Route::post('modify', 'modify')->name('modify');
+
+                    // soft delete
+                    Route::post('{id}/destroy', 'destroy')
+                        ->withTrashed()
+                        ->name('destroy');
+
+                    // restore
+                    Route::post('{id}/restore', 'restore')
+                        ->withTrashed()
+                        ->name('restore');
+                });
+        });
+
+        /**
+         * =========================
+         * Load Routes
+         * =========================
+         */
         $this->routes(function () {
             Route::middleware('api')
-                ->namespace($this->namespace)
                 ->group(base_path('routes/api.php'));
 
             Route::middleware('web')
-                ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
         });
     }
 
-    /**
-     * Configure the rate limiters for the application.
-     *
-     * @return void
-     */
     protected function configureRateLimiting()
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
+            return Limit::perMinute(60)
+                ->by(optional($request->user())->id ?: $request->ip());
         });
     }
 }

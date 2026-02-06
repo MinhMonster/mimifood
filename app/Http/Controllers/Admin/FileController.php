@@ -25,7 +25,7 @@ class FileController extends Controller
     {
         $request->validate([
             'files' => 'required|array',
-            'files.*' => 'file|mimes:jpeg,png,jpg,gif|max:10240'
+            'files.*' => 'file|mimes:jpeg,png,jpg,gif|max:51200'
         ]);
 
         // Chọn disk

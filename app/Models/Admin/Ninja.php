@@ -10,7 +10,6 @@ use App\Traits\Account\AccountRelations;
 use App\Traits\Account\AccountAttributes;
 use App\Traits\Filterable;
 
-
 class Ninja extends Model
 {
     use HasFactory;
@@ -65,6 +64,10 @@ class Ninja extends Model
         'item_13',
     ];
 
+    protected $casts = [
+        'images' => 'array',
+    ];
+
     protected function filterableFields(): array
     {
         return [
@@ -87,15 +90,6 @@ class Ninja extends Model
             },
         ];
     }
-
-    /**
-     *
-     *
-     * @var array
-     */
-    protected $casts = [
-        'images' => 'array',
-    ];
 
     public function getAccountTypeAttribute()
     {

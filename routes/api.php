@@ -20,9 +20,9 @@ use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\TopicController as AdminTopicController;
-use App\Http\Controllers\Admin\NinjaController as AdminNinjaController;
-use App\Http\Controllers\Admin\AvatarController as AdminAvatarController;
-use App\Http\Controllers\Admin\DragonBallController as AdminDragonBallController;
+use App\Http\Controllers\Admin\AdminNinjaController;
+use App\Http\Controllers\Admin\AdminAvatarController;
+use App\Http\Controllers\Admin\AdminDragonBallController;
 use App\Http\Controllers\Admin\DiscountController as AdminDiscountController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\TopUpTransactionsController as AdminTopUpTransactionsController;
@@ -125,24 +125,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
     Route::post('/files/uploads', [FileController::class, 'uploads'])->name('admin.files.uploads');
     Route::delete('/files/{id}/delete', [FileController::class, 'delete'])->name('admin.files.delete');
     Route::group(['prefix' => 'game'], function () {
-        // Admin Ninja
-        Route::get('/ninjas', [AdminNinjaController::class, 'index'])->name('admin.ninjas.index');
-        Route::post('/ninjas/modify', [AdminNinjaController::class, 'modify'])->name('admin.ninjas.modify');
-        Route::post('/ninjas/{account}/destroy', [AdminNinjaController::class, 'destroy'])->withTrashed()->name('admin.ninjas.destroy');
-        Route::post('/ninjas/{account}/restore', [AdminNinjaController::class, 'restore'])->withTrashed()->name('admin.ninjas.restore');
-        Route::get('/ninjas/{id}', [AdminNinjaController::class, 'show'])->name('admin.ninjas.show');
-        // Admin Avatar
-        Route::get('/avatars', [AdminAvatarController::class, 'index'])->name('admin.avatars.index');
-        Route::post('/avatars/modify', [AdminAvatarController::class, 'modify'])->name('admin.avatars.modify');
-        Route::post('/avatars/destroy', [AdminAvatarController::class, 'destroy'])->name('admin.avatars.destroy');
-        Route::post('/avatars/restore', [AdminAvatarController::class, 'restore'])->name('admin.avatars.restore');
-        Route::get('/avatars/{id}', [AdminAvatarController::class, 'show'])->name('admin.avatars.show');
-        // Admin Dragon ball
-        Route::get('/dragon-balls', [AdminDragonBallController::class, 'index'])->name('admin.dragon-balls.index');
-        Route::post('/dragon-balls/modify', [AdminDragonBallController::class, 'modify'])->name('admin.dragon-balls.modify');
-        Route::post('/dragon-balls/destroy', [AdminDragonBallController::class, 'destroy'])->name('admin.dragon-balls.destroy');
-        Route::post('/dragon-balls/restore', [AdminDragonBallController::class, 'restore'])->name('admin.dragon-balls.restore');
-        Route::get('/dragon-balls/{id}', [AdminDragonBallController::class, 'show'])->name('admin.dragon-balls.show');
+        Route::adminGameCrud('ninjas', AdminNinjaController::class);
+        Route::adminGameCrud('avatars', AdminAvatarController::class);
+        Route::adminGameCrud('dragon-balls', AdminDragonBallController::class);
     });
     // Admin Discount
     Route::prefix('discounts')->name('admin.discounts.')->controller(AdminDiscountController::class)->group(function () {

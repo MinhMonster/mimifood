@@ -5,9 +5,10 @@ namespace App\Models\Admin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 use App\Traits\Account\AccountRelations;
 use App\Traits\Account\AccountAttributes;
+use App\Traits\Filterable;
 
 class DragonBall extends Model
 {
@@ -15,6 +16,7 @@ class DragonBall extends Model
     use SoftDeletes;
     use AccountRelations;
     use AccountAttributes;
+    use Filterable;
 
     protected $table = 'dragon_balls';
 
@@ -57,58 +59,27 @@ class DragonBall extends Model
         'is_sold' => false,
     ];
 
-    /**
-     * Scope a query to search
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeSearch($query, Request $request)
+    protected function filterableFields(): array
     {
-        $input = json_decode($request->input('input', '{}'));
-        $search = $input->q ?? null;
-        // return $search;
-        if (empty($search)) {
-            return $query;
-        }
-
-        return $query->where(function ($q) use ($search) {
-            if (!empty($search->code)) {
-                $q->where('code', $search->code);
-            }
-
-
-            if (!empty($search->cash)) {
-                if (isset($search->cash->min)) {
-                    $q->where('selling_price', '>=', $search->cash->min);
+        return [
+            'id' => ['id'],
+            'code' => ['code', 'like'],
+            'username' => ['username', 'like'],
+            'character_name' => ['character_name', 'like'],
+            'server' => ['server'],
+            'planet' => ['planet'],
+            'cash' => ['selling_price', 'range'],
+            'is_sold' => ['is_sold'],
+            'deleted_at' => function (Builder $query, $value) {
+                if ((int) $value === 1) {
+                    // Deleted
+                    $query->onlyTrashed();
+                } elseif ((int) $value === 0) {
+                    // Active
+                    $query->whereNull('deleted_at');
                 }
-
-                if (isset($search->cash->max)) {
-                    $q->where('selling_price', '<=', $search->cash->max);
-                }
-            }
-
-            if (!empty($search->planet)) {
-                $q->where('planet', 'like', "%{$search->planet}%");
-            }
-
-            if (!empty($search->server)) {
-                $q->where('server', 'like', "%{$search->server}%");
-            }
-
-            if (!empty($search->username)) {
-                $q->where('username', 'like', "%{$search->username}%");
-            }
-
-            if (!empty($search->ingame)) {
-                $q->where('character_name', 'like', "%{$search->ingame}%");
-            }
-
-            if (!empty($search->family)) {
-                $q->where('is_family', $search->family);
-            }
-        });
+            },
+        ];
     }
 
     public function getAccountTypeAttribute()
