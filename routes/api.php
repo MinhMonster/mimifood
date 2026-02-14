@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\DiscountController as AdminDiscountController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\TopUpTransactionsController as AdminTopUpTransactionsController;
 use App\Http\Controllers\Admin\CarrotTransactionController as AdminCarrotTransactionController;
+use App\Http\Controllers\Admin\AdminNinjaCoinTransactionController;
 use App\Http\Controllers\Admin\WalletTransactionController as AdminWalletTransactionController;
 use App\Http\Controllers\Admin\AccountPurchaseController as AdminAccountPurchaseController;
 use App\Http\Controllers\Admin\FolderController;
@@ -160,6 +161,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
         Route::get('/', [AdminCarrotTransactionController::class, 'index'])
             ->name('index');
         Route::post('/update-status', [AdminCarrotTransactionController::class, 'updateStatus'])
+            ->name('update-status');
+    });
+    Route::prefix('/ninja-coins')->name('ninja-coins.')->group(function () {
+        Route::get('/', [AdminNinjaCoinTransactionController::class, 'index'])
+            ->name('index');
+        Route::post('/update-status', [AdminNinjaCoinTransactionController::class, 'updateStatus'])
             ->name('update-status');
     });
 });
