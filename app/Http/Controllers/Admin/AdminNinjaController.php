@@ -28,6 +28,7 @@ class AdminNinjaController extends AdminGameAccountController
                     'string',
                     Rule::unique('ninjas')
                         ->ignore($id)
+                        ->where('is_sold', false)
                         ->whereNull('deleted_at'),
                 ],
                 'character_name' => 'required|string',

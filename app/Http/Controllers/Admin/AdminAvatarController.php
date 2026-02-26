@@ -26,7 +26,10 @@ class AdminAvatarController extends AdminGameAccountController
             'username' => [
                 'required',
                 'string',
-                Rule::unique('avatars')->ignore($id)->whereNull('deleted_at'),
+                Rule::unique('avatars')
+                    ->ignore($id)
+                    ->where('is_sold', false)
+                    ->whereNull('deleted_at'),
             ],
             'description' => 'required|string',
             'images' => 'required|array',

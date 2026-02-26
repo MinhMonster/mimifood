@@ -25,7 +25,10 @@ class AdminDragonBallController extends AdminGameAccountController
             'username' => [
                 'required',
                 'string',
-                Rule::unique('dragon_balls')->ignore($id)->whereNull('deleted_at'),
+                Rule::unique('dragon_balls')
+                ->ignore($id)
+                ->where('is_sold', false)
+                ->whereNull('deleted_at'),
             ],
             'description' => 'nullable|string',
             'images' => 'required|array',
