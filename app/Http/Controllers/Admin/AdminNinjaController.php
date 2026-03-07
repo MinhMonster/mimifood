@@ -34,6 +34,7 @@ class AdminNinjaController extends AdminGameAccountController
                 'character_name' => 'required|string',
                 'description' => 'required|string',
                 'images' => 'required|array',
+                'is_family' => 'required|boolean',
                 'is_full_image' => 'required|boolean',
                 'selling_price' => 'required|integer',
                 'purchase_price' => 'required|integer',

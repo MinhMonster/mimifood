@@ -28,6 +28,7 @@ class Ninja extends Model
         'transfer_pin',
         'description',
         'images',
+        'is_family',
         'is_full_image',
         'selling_price',
         'purchase_price',
@@ -66,6 +67,16 @@ class Ninja extends Model
 
     protected $casts = [
         'images' => 'array',
+        'is_family' => 'boolean',
+        'is_full_image' => 'boolean',
+        'selling_price' => 'integer',
+        'purchase_price' => 'integer',
+        'discount_percent' => 'integer',
+        'class' => 'integer',
+        'level' => 'integer',
+        'server' => 'integer',
+        'weapon' => 'integer',
+        'type' => 'integer',
     ];
 
     protected function filterableFields(): array
