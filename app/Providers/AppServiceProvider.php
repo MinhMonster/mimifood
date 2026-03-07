@@ -4,9 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use App\Models\Ninja;
-use App\Models\Avatar;
-use App\Models\DragonBall;
+use App\Models\Admin\Ninja;
+use App\Models\Admin\Avatar;
+use App\Models\Admin\DragonBall;
 
 class AppServiceProvider extends ServiceProvider
 {

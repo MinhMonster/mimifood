@@ -39,6 +39,14 @@ class Avatar extends Model
 
     protected $casts = [
         'images' => 'array',
+        'is_full_image' => 'boolean',
+        'selling_price' => 'integer',
+        'purchase_price' => 'integer',
+        'discount_percent' => 'integer',
+        'land' => 'integer',
+        'pets' => 'integer',
+        'fish' => 'integer',
+        'sex' => 'integer'
     ];
 
     protected function filterableFields(): array

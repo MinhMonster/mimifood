@@ -12,7 +12,7 @@ class AccountPurchaseController extends Controller
 {
     public function index(Request $request)
     {
-        $query = AccountPurchase::query()->search($request)->with('user');
+        $query = AccountPurchase::query()->filter()->with('user')->with('account');
 
         return formatPaginate(
             $query,
