@@ -31,6 +31,17 @@ class Avatar extends BaseGameAccountModel
     protected $casts = [
         'images' => 'array',
         'is_full_image' => 'boolean',
+        'is_installments' => 'boolean',
+        'is_deposit' => 'boolean',
+        'installments_price' => 'integer',
+        'deposit_price' => 'integer',
+        'selling_price' => 'integer',
+        'purchase_price' => 'integer',
+        'discount_percent' => 'integer',
+        'land' => 'integer',
+        'pets' => 'integer',
+        'fish' => 'integer',
+        'sex' => 'integer',
     ];
 
     protected function filterableFields(): array

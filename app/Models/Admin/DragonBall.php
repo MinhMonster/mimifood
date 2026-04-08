@@ -37,6 +37,10 @@ class DragonBall extends Model
         'type',
         'description',
         'is_sold',
+        'is_installments',
+        'is_deposit',
+        'installments_price',
+        'deposit_price',
     ];
 
     /**
@@ -47,8 +51,12 @@ class DragonBall extends Model
         'is_sold' => 'boolean',
         'is_family' => 'boolean',
         'is_full_image' => 'boolean',
+        'is_installments' => 'boolean',
+        'is_deposit' => 'boolean',
         'selling_price' => 'decimal:0',
         'purchase_price' => 'decimal:0',
+        'deposit_price' => 'integer',
+        'installments_price' => 'integer',
         'discount_percent' => 'decimal:0',
     ];
 

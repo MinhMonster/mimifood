@@ -26,20 +26,24 @@ class AdminDragonBallController extends AdminGameAccountController
                 'required',
                 'string',
                 Rule::unique('dragon_balls')
-                ->ignore($id)
-                ->where('is_sold', false)
-                ->whereNull('deleted_at'),
+                    ->ignore($id)
+                    ->where('is_sold', false)
+                    ->whereNull('deleted_at'),
             ],
             'description' => 'nullable|string',
             'images' => 'required|array',
             'selling_price' => 'required|integer',
             'purchase_price' => 'required|integer',
+            'deposit_price' => 'nullable|integer',
+            'installments_price' => 'nullable|integer',
             'discount_percent' => 'nullable|integer',
             'planet' => 'required|integer',
             'server' => 'required|integer',
             'type' => ['required', Rule::in([1, 2, 3])],
             'strength' => 'required|string',
             'disciple' => 'required|string',
+            'is_installments' => 'nullable|boolean',
+            'is_deposit' => 'nullable|boolean',
         ];
     }
 }

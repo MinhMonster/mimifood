@@ -21,6 +21,28 @@ return [
             'direction'  => 'out',
             'content' => 'Thanh toán cho đơn hàng mua nick',
         ],
+        'purchase_account_installment_first' => [
+            'label'     => 'Mua nick trả góp - lần 1',
+            'direction' => 'out',
+            'content'   => 'Thanh toán mua nick trả góp lần 1',
+        ],
+        'purchase_account_installment_second' => [
+            'label'     => 'Mua nick trả góp - lần 2',
+            'direction' => 'out',
+            'content'   => 'Thanh toán mua nick trả góp lần 2',
+        ],
+
+        'purchase_account_deposit' => [
+            'label'     => 'Đặt cọc mua nick',
+            'direction' => 'out',
+            'content'   => 'Thanh toán đặt cọc mua nick',
+        ],
+
+        'purchase_account_deposit_completed' => [
+            'label'     => 'Thanh toán còn lại sau đặt cọc',
+            'direction' => 'out',
+            'content'   => 'Thanh toán phần còn lại cho đơn đặt cọc mua nick',
+        ],
         'purchase_carrot' => [
             'label' => 'Thanh toán đơn hàng Carrot',
             'direction'  => 'out',
@@ -35,6 +57,16 @@ return [
             'label' => 'Hoàn tiền mua nick',
             'direction'  => 'in',
             'content' => 'Hoàn tiền cho đơn hàng mua nick',
+        ],
+        'refund_account_deposit' => [
+            'label' => 'Hoàn tiền đặt cọc mua nick',
+            'direction'  => 'in',
+            'content' => 'Hoàn tiền cho đơn đặt cọc mua nick',
+        ],
+        'refund_account_installments' => [
+            'label' => 'Hoàn tiền mua nick trả góp',
+            'direction'  => 'in',
+            'content' => 'Hoàn tiền cho đơn hàng mua nick trả góp',
         ],
         'refund_carrot' => [
             'label' => 'Hoàn tiền nạp  Carrot',

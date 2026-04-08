@@ -77,6 +77,8 @@ Route::group(['middleware' => 'is_user'], function () {
     Route::post('/account-purchases', [AccountPurchaseController::class, 'purchase']);
     Route::get('/account-purchases', [AccountPurchaseController::class, 'index']);
     Route::get('/account-purchases/{id}', [AccountPurchaseController::class, 'show']);
+    Route::get('/account-purchases/{accountPurchase}/cancel', [AccountPurchaseController::class, 'cancel']);
+    Route::get('/account-purchases/{accountPurchase}/pay-remaining', [AccountPurchaseController::class, 'payRemaining']);
     Route::prefix('top-up')->name('top-up.')->group(function () {
         Route::prefix('bank')->name('bank.')->group(function () {
             Route::get('/', [TopUpTransactionsController::class, 'index'])->name('index');
@@ -147,6 +149,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
         Route::get('/', [AdminAccountPurchaseController::class, 'index'])->name('index');
         Route::post('/{id}/update', [AdminAccountPurchaseController::class, 'update'])->name('update');
         Route::post('/{id}/update-account', [AdminAccountPurchaseController::class, 'updateAccount'])->name('updateAccount');
+        Route::get('/{accountPurchase}/cancel', [AdminAccountPurchaseController::class, 'cancel'])->name('cancel');
+        Route::post('/{accountPurchase}/update-status', [AdminAccountPurchaseController::class, 'updateStatus'])->name('update-status');
+        Route::get('/{accountPurchase}/cancel-and-refund', [AdminAccountPurchaseController::class, 'cancelAndRefund'])->name('cancel-and-refund');
     });
 
     Route::prefix('wallet-transactions')

@@ -19,6 +19,13 @@ class Ninja extends BaseGameAccountModel
         'images' => 'array',
         'is_family' => 'boolean',
         'is_full_image' => 'boolean',
+        'is_installments' => 'boolean',
+        'is_deposit' => 'boolean',
+        'installments_price' => 'integer',
+        'deposit_price' => 'integer',
+        'selling_price' => 'integer',
+        'purchase_price' => 'integer',
+        'discount_percent' => 'integer',
     ];
 
     protected function filterableFields(): array

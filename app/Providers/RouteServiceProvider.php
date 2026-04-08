@@ -52,6 +52,9 @@ class RouteServiceProvider extends ServiceProvider
                     Route::post('{id}/restore', 'restore')
                         ->withTrashed()
                         ->name('restore');
+                    // toggle deposit & installments
+                    Route::get('{id}/toggle-deposit', 'toggleDeposit')->name('toggle-deposit');
+                    Route::get('{id}/toggle-installments', 'toggleInstallments')->name('toggle-installments');
                 });
         });
 

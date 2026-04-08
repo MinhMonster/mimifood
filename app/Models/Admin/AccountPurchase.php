@@ -5,6 +5,7 @@ namespace App\Models\Admin;
 use App\Traits\Filterable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Enums\AccountPurchaseStatus;
 
 class AccountPurchase extends Model
 {
@@ -72,5 +73,22 @@ class AccountPurchase extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getStatusAttribute($value)
+    {
+        if (
+            in_array($value, [
+                AccountPurchaseStatus::DEPOSIT,
+                AccountPurchaseStatus::INSTALLMENT_FIRST,
+            ]) &&
+            $this->deadline_at &&
+            $this->deadline_at < now() &&
+            $this->cancelled_at === null
+        ) {
+            return AccountPurchaseStatus::EXPIRED;
+        }
+
+        return $value;
     }
 }

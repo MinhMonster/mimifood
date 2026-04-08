@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin\AccountPurchase;
+use App\Models\WalletTransaction;
 use App\Support\SumConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Enums\AccountPurchaseStatus;
+use App\Enums\AccountPurchaseType;
 
 class AccountPurchaseController extends Controller
 {
@@ -91,6 +94,96 @@ class AccountPurchaseController extends Controller
 
             return response()->json([
                 'message' => 'Cập nhật tài khoản thành công',
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+
+            return response()->json([
+                'message' => 'Đã có lỗi xảy ra.',
+            ], 500);
+        }
+    }
+
+    public function cancelAndRefund(AccountPurchase $accountPurchase)
+    {
+        if ($accountPurchase->type === AccountPurchaseType::NORMAL) {
+            return response()->json([
+                'message' => 'Giao dịch này không thể hủy và hoàn tiền.',
+            ], 409);
+        }
+        if ($accountPurchase->status === AccountPurchaseStatus::CANCELLED_REFUNDED) {
+            return response()->json([
+                'message' => 'Giao dịch đã được hủy và hoàn tiền trước đó.',
+            ], 409);
+        }
+
+        if ($accountPurchase->status === AccountPurchaseStatus::COMPLETED) {
+            return response()->json([
+                'message' => 'Giao dịch đã hoàn thành trước đó.',
+            ], 409);
+        }
+
+        DB::beginTransaction();
+        try {
+            $accountPurchase->status = AccountPurchaseStatus::CANCELLED_REFUNDED;
+            $accountPurchase->save();
+
+            // Hoàn tiền cho người mua
+            $price = $accountPurchase->selling_price;
+            if ($accountPurchase->type === AccountPurchaseType::DEPOSIT) {
+                $amount = $price * 0.2; // Hoàn lại 20% số tiền đã thanh toán
+            } elseif ($accountPurchase->type === AccountPurchaseType::INSTALLMENTS) {
+                $amount = $price * 0.5; // Hoàn lại 50% số tiền đã thanh toán
+            }
+
+            $user = $accountPurchase->user;
+            $user->increment('cash', $amount);
+
+            // tạo transaction cho phần thanh toán còn lại
+            $walletTransactionType = $accountPurchase->type === AccountPurchaseType::INSTALLMENTS ? 'refund_account_installments' : 'refund_account_deposit';
+            $transaction = config('transactions.types.' . $walletTransactionType);
+            WalletTransaction::create([
+                'user_id'        => $user->id,
+                'type'           => $walletTransactionType,
+                'reference_type' => AccountPurchase::class,
+                'reference_id'   => $accountPurchase->id,
+                'direction'      => $transaction['direction'],
+                'amount'         => $amount,
+                'balance_before' => $user->cash + $amount,
+                'balance_after'  => $user->cash,
+                'description'    => $transaction['content'] . " #{$accountPurchase->id}",
+            ]);
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Giao dịch đã được hủy và hoàn tiền cho người mua.',
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+
+            return response()->json([
+                'message' => 'Đã có lỗi xảy ra.',
+            ], 500);
+        }
+    }
+
+    public function updateStatus(AccountPurchase $accountPurchase, Request $request)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string|in:completed,cancelled',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $accountPurchase->status = $validated['status'];
+            $accountPurchase->save();
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Trạng thái giao dịch đã được cập nhật.',
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();

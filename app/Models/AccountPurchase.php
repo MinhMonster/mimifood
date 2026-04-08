@@ -8,6 +8,7 @@ use App\Models\DragonBall;
 use App\Traits\HidesTimestamps;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Enums\AccountPurchaseStatus;
 
 class AccountPurchase extends Model
 {
@@ -31,10 +32,20 @@ class AccountPurchase extends Model
         'purchase_price',
         'images',
         'note',
+        'type',
+        'status',
+        'first_paid_amount',
+        'second_paid_amount',
+        'deadline_at',
+        'cancelled_at',
+        'completed_at',
     ];
 
     protected $casts = [
         'images' => 'array',
+        'deadline_at' => 'datetime:d-m-Y - H:i:s',
+        'cancelled_at' => 'datetime:d-m-Y - H:i:s',
+        'completed_at' => 'datetime:d-m-Y - H:i:s',
     ];
 
     protected $attributes = [
@@ -85,5 +96,22 @@ class AccountPurchase extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getStatusAttribute($value)
+    {
+        if (
+            in_array($value, [
+                AccountPurchaseStatus::DEPOSIT,
+                AccountPurchaseStatus::INSTALLMENT_FIRST,
+            ]) &&
+            $this->deadline_at &&
+            $this->deadline_at < now() &&
+            $this->cancelled_at === null
+        ) {
+            return AccountPurchaseStatus::EXPIRED;
+        }
+
+        return $value;
     }
 }

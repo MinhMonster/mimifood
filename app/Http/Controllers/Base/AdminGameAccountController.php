@@ -167,6 +167,44 @@ abstract class AdminGameAccountController extends Controller
         return fetchData($account);
     }
 
+    public function toggleDeposit(Request $request)
+    {
+        $id = $request->id;
+
+        $account = ($this->model())::withTrashed()->find($id);
+
+        if (!$account) {
+            return $this->notFoundResponse();
+        }
+
+        $account->is_deposit = !$account->is_deposit;
+        $account->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $account->is_deposit ? 'Deposit is On' : 'Deposit is Off',
+        ]);
+    }
+
+    public function toggleInstallments(Request $request)
+    {
+        $id = $request->id;
+
+        $account = ($this->model())::withTrashed()->find($id);
+
+        if (!$account) {
+            return $this->notFoundResponse();
+        }
+
+        $account->is_installments = !$account->is_installments;
+        $account->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $account->is_installments ? 'Installments is On' : 'Installments is Off',
+        ]);
+    }
+
     protected function notFoundResponse()
     {
         return response()->json([
