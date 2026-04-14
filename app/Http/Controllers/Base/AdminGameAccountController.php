@@ -2,61 +2,46 @@
 
 namespace App\Http\Controllers\Base;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Validator;
 use App\Support\SumConfig;
 
-abstract class AdminGameAccountController extends Controller
+abstract class AdminGameAccountController extends BaseCrudController
 {
     /**
-     * Trả về Model class (VD: Ninja::class)
-     *
-     * @return class-string<Model>
-     */
-    abstract protected function model(): string;
-
-    /**
-     * Rules validate – controller con tự định nghĩa
-     */
-    abstract protected function rules(?int $id = null): array;
-
-    /**
-     * Message not found
+     * Message not found (có thể override)
      */
     protected function notFoundMessage(): string
     {
         return 'Account not found';
     }
 
-    /**
-     * Instance model
-     */
-    protected function modelInstance(): Model
+    protected function notFoundResponse()
     {
-        return app($this->model());
+        return response()->json([
+            'status' => 'error',
+            'message' => $this->notFoundMessage(),
+        ], 404);
     }
 
     /**
-     * Query chung cho admin index
+     * Query riêng cho game account
      */
-    protected function baseQuery(): Builder
+    protected function query(): Builder
     {
-        return $this->modelInstance()
-            ->newQuery()
+        return parent::query()
             ->filter()
             ->orderByDesc('code');
     }
 
     /**
-     * Danh sách admin
+     * Override index để thêm SumConfig
      */
     public function index(Request $request)
     {
         return formatPaginate(
-            $this->baseQuery(),
+            $this->query(),
             $request,
             [],
             SumConfig::account_game()
@@ -64,114 +49,24 @@ abstract class AdminGameAccountController extends Controller
     }
 
     /**
-     * Tạo / cập nhật
+     * Hook trước khi save
      */
-    public function modify(Request $request)
+    protected function beforeSave(array &$data, ?Model $model = null): void
     {
-        $id = $request->id;
-        $input = $request->input('input');
-
-        $validator = Validator::make($input, $this->rules($id));
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation errors',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        $validated = $validator->validated();
-
-        // auto code
-        if (empty($validated['code'])) {
-            $validated['code'] = (
+        // auto generate code nếu chưa có
+        if (empty($data['code'])) {
+            $data['code'] = (
                 ($this->model())::withTrashed()->max('code') ?? 0
             ) + 1;
         }
-
-        // create
-        if (!$id) {
-            $model = $this->modelInstance();
-            $model->fill($validated)->save();
-            return fetchData($model);
-        }
-
-        // update
-        $model = ($this->model())::withTrashed()->find($id);
-        if (!$model) {
-            return $this->notFoundResponse();
-        }
-
-        $model->fill($validated)->save();
-        return fetchData($model);
     }
 
     /**
-     * Chi tiết (admin thấy cả soft delete)
+     * Toggle deposit
      */
-    public function show(Request $request)
-    {
-        $id = $request->id;
-
-        $account = ($this->model())::withTrashed()->find($id);
-
-        if (! $account) {
-            return $this->notFoundResponse();
-        }
-
-        return fetchData($account);
-    }
-
-    /**
-     * Soft delete (admin)
-     */
-    public function destroy(Request $request)
-    {
-        $id = $request->id;
-
-        $account = ($this->model())::withTrashed()->find($id);
-
-        if (! $account) {
-            return $this->notFoundResponse();
-        }
-
-        if ($account->trashed()) {
-            return fetchData($account);
-        }
-
-        $account->delete();
-
-        return fetchData($account);
-    }
-
-    /**
-     * Restore soft deleted account
-     */
-    public function restore(Request $request)
-    {
-        $id = $request->id;
-
-        $account = ($this->model())::withTrashed()->find($id);
-
-        if (! $account) {
-            return $this->notFoundResponse();
-        }
-
-        if (! $account->trashed()) {
-            return fetchData($account);
-        }
-
-        $account->restore();
-
-        return fetchData($account);
-    }
-
     public function toggleDeposit(Request $request)
     {
-        $id = $request->id;
-
-        $account = ($this->model())::withTrashed()->find($id);
+        $account = $this->findById($request->id);
 
         if (!$account) {
             return $this->notFoundResponse();
@@ -182,15 +77,18 @@ abstract class AdminGameAccountController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => $account->is_deposit ? 'Deposit is On' : 'Deposit is Off',
+            'message' => $account->is_deposit
+                ? 'Deposit is On'
+                : 'Deposit is Off',
         ]);
     }
 
+    /**
+     * Toggle installments
+     */
     public function toggleInstallments(Request $request)
     {
-        $id = $request->id;
-
-        $account = ($this->model())::withTrashed()->find($id);
+        $account = $this->findById($request->id);
 
         if (!$account) {
             return $this->notFoundResponse();
@@ -201,15 +99,9 @@ abstract class AdminGameAccountController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => $account->is_installments ? 'Installments is On' : 'Installments is Off',
+            'message' => $account->is_installments
+                ? 'Installments is On'
+                : 'Installments is Off',
         ]);
-    }
-
-    protected function notFoundResponse()
-    {
-        return response()->json([
-            'status' => 'error',
-            'message' => $this->notFoundMessage(),
-        ], 404);
     }
 }

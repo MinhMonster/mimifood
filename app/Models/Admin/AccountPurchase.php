@@ -5,6 +5,7 @@ namespace App\Models\Admin;
 use App\Traits\Filterable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 use App\Enums\AccountPurchaseStatus;
 
 class AccountPurchase extends Model
@@ -56,6 +57,15 @@ class AccountPurchase extends Model
             'user_id' => ['user.id'],
             'user_name' => ['user.name', 'like'],
             'created_at' => ['created_at', 'date_range'],
+            'deleted_at' => function (Builder $query, $value) {
+                if ((int) $value === 1) {
+                    // Deleted
+                    $query->onlyTrashed();
+                } elseif ((int) $value === 0) {
+                    // Active
+                    $query->whereNull('deleted_at');
+                }
+            },
         ];
     }
 

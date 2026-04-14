@@ -2,34 +2,65 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Base\BaseCrudController;
 use App\Models\Admin\AccountPurchase;
 use App\Models\WalletTransaction;
 use App\Support\SumConfig;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use App\Enums\AccountPurchaseStatus;
 use App\Enums\AccountPurchaseType;
 
-class AccountPurchaseController extends Controller
+class AccountPurchaseController extends BaseCrudController
 {
+    /**
+     * Model
+     */
+    protected function model(): string
+    {
+        return AccountPurchase::class;
+    }
+
+    /**
+     * Không dùng modify chung → disable rules
+     */
+    protected function rules(?int $id = null): array
+    {
+        return [];
+    }
+
+    /**
+     * Query riêng
+     */
+    protected function query(): Builder
+    {
+        return parent::query()
+            ->filter()
+            ->with(['user', 'account']);
+    }
+
+    /**
+     * Index custom (có SumConfig)
+     */
     public function index(Request $request)
     {
-        $query = AccountPurchase::query()->filter()->with('user')->with('account');
-
         return formatPaginate(
-            $query,
+            $this->query(),
             $request,
             [],
             SumConfig::for('account_purchase')
         );
     }
 
+    /**
+     * Update history (không dùng modify vì logic riêng)
+     */
     public function update(Request $request, int $id)
     {
-        $history = AccountPurchase::withTrashed()->find($id);
+        $history = $this->findById($id);
 
-        if (! $history) {
+        if (!$history) {
             return response()->json([
                 'status'  => 'error',
                 'message' => 'Giao dịch này không tồn tại',
@@ -37,10 +68,10 @@ class AccountPurchaseController extends Controller
         }
 
         $validated = $request->validate([
-            'selling_price' => 'required|integer',
+            'selling_price'  => 'required|integer',
             'purchase_price' => 'required|integer',
-            'images' => 'nullable|array',
-            'note' => 'nullable|string',
+            'images'         => 'nullable|array',
+            'note'           => 'nullable|string',
         ]);
 
         DB::beginTransaction();
@@ -61,7 +92,10 @@ class AccountPurchaseController extends Controller
         }
     }
 
-    public function updateAccount(Request $request, int $id)
+    /**
+     * Update account info
+     */
+    public function updateAccount(Request $request)
     {
         $validated = $request->validate([
             'username'      => 'required|string',
@@ -69,9 +103,9 @@ class AccountPurchaseController extends Controller
             'transfer_pin'  => 'nullable|regex:/^[1-9]{4}$/',
         ]);
 
-        $history = AccountPurchase::withTrashed()->find($request->history_id);
+        $history = $this->findById($request->history_id);
 
-        if (! $history) {
+        if (!$history) {
             return response()->json([
                 'status'  => 'error',
                 'message' => 'Giao dịch này không tồn tại',
@@ -105,6 +139,9 @@ class AccountPurchaseController extends Controller
         }
     }
 
+    /**
+     * Hủy + hoàn tiền
+     */
     public function cancelAndRefund(AccountPurchase $accountPurchase)
     {
         if ($accountPurchase->type === AccountPurchaseType::NORMAL) {
@@ -112,6 +149,7 @@ class AccountPurchaseController extends Controller
                 'message' => 'Giao dịch này không thể hủy và hoàn tiền.',
             ], 409);
         }
+
         if ($accountPurchase->status === AccountPurchaseStatus::CANCELLED_REFUNDED) {
             return response()->json([
                 'message' => 'Giao dịch đã được hủy và hoàn tiền trước đó.',
@@ -129,20 +167,31 @@ class AccountPurchaseController extends Controller
             $accountPurchase->status = AccountPurchaseStatus::CANCELLED_REFUNDED;
             $accountPurchase->save();
 
-            // Hoàn tiền cho người mua
             $price = $accountPurchase->selling_price;
-            if ($accountPurchase->type === AccountPurchaseType::DEPOSIT) {
-                $amount = $price * 0.2; // Hoàn lại 20% số tiền đã thanh toán
-            } elseif ($accountPurchase->type === AccountPurchaseType::INSTALLMENTS) {
-                $amount = $price * 0.5; // Hoàn lại 50% số tiền đã thanh toán
+
+            switch ($accountPurchase->type) {
+                case AccountPurchaseType::DEPOSIT:
+                    $amount = $price * 0.2;
+                    break;
+
+                case AccountPurchaseType::INSTALLMENTS:
+                    $amount = $price * 0.5;
+                    break;
+
+                default:
+                    $amount = 0;
             }
 
             $user = $accountPurchase->user;
             $user->increment('cash', $amount);
 
-            // tạo transaction cho phần thanh toán còn lại
-            $walletTransactionType = $accountPurchase->type === AccountPurchaseType::INSTALLMENTS ? 'refund_account_installments' : 'refund_account_deposit';
+            $walletTransactionType =
+                $accountPurchase->type === AccountPurchaseType::INSTALLMENTS
+                ? 'refund_account_installments'
+                : 'refund_account_deposit';
+
             $transaction = config('transactions.types.' . $walletTransactionType);
+
             WalletTransaction::create([
                 'user_id'        => $user->id,
                 'type'           => $walletTransactionType,
@@ -154,6 +203,7 @@ class AccountPurchaseController extends Controller
                 'balance_after'  => $user->cash,
                 'description'    => $transaction['content'] . " #{$accountPurchase->id}",
             ]);
+
             DB::commit();
 
             return response()->json([
@@ -169,6 +219,9 @@ class AccountPurchaseController extends Controller
         }
     }
 
+    /**
+     * Update status
+     */
     public function updateStatus(AccountPurchase $accountPurchase, Request $request)
     {
         $validated = $request->validate([

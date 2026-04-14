@@ -152,6 +152,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is_admin'], function () {
         Route::get('/{accountPurchase}/cancel', [AdminAccountPurchaseController::class, 'cancel'])->name('cancel');
         Route::post('/{accountPurchase}/update-status', [AdminAccountPurchaseController::class, 'updateStatus'])->name('update-status');
         Route::get('/{accountPurchase}/cancel-and-refund', [AdminAccountPurchaseController::class, 'cancelAndRefund'])->name('cancel-and-refund');
+        Route::delete('/{id}/destroy', [AdminAccountPurchaseController::class, 'destroy'])->name('destroy');
+        Route::patch('/{id}/restore', [AdminAccountPurchaseController::class, 'restore'])->name('restore');
     });
 
     Route::prefix('wallet-transactions')
