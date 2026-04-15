@@ -55,6 +55,9 @@ class AccountPurchase extends Model
             'account_name' => ['account.username', 'like'],
             'account_code' => ['account.code', 'like'],
             'user_id' => ['user.id'],
+            'type' => ['type'],
+            'status' => ['status'],
+            'account_type' => ['account_type'],
             'user_name' => ['user.name', 'like'],
             'created_at' => ['created_at', 'date_range'],
             'deleted_at' => function (Builder $query, $value) {
