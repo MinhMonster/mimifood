@@ -32,6 +32,7 @@ class CreateNinjasTable extends Migration
             $table->integer('weapon');
             $table->integer('type');
             $table->text('description');
+            $table->string('owner', 255)->nullable();
             $table->boolean('is_sold')->default(false);
             $table->unsignedBigInteger('author_id')->default(1);
 

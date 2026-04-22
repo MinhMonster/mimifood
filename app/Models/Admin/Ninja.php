@@ -37,6 +37,7 @@ class Ninja extends Model
         'selling_price',
         'purchase_price',
         'discount_percent',
+        'owner',
         'class',
         'level',
         'server',
@@ -98,6 +99,7 @@ class Ninja extends Model
             'class' => ['class'],
             'cash' => ['selling_price', 'range'],
             'is_sold' => ['is_sold'],
+            'owner' => ['owner'],
             'deleted_at' => function (Builder $query, $value) {
                 if ((int) $value === 1) {
                     // Deleted

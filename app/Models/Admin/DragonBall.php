@@ -37,6 +37,7 @@ class DragonBall extends Model
         'type',
         'description',
         'is_sold',
+        'owner',
         'is_installments',
         'is_deposit',
         'installments_price',
@@ -78,6 +79,7 @@ class DragonBall extends Model
             'planet' => ['planet'],
             'cash' => ['selling_price', 'range'],
             'is_sold' => ['is_sold'],
+            'owner' => ['owner'],
             'deleted_at' => function (Builder $query, $value) {
                 if ((int) $value === 1) {
                     // Deleted

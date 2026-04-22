@@ -34,6 +34,7 @@ class CreateDragonBallsTable extends Migration
             $table->integer('type')->nullable();
 
             $table->text('description')->nullable();
+            $table->string('owner', 255)->nullable();
             $table->boolean('is_sold')->default(false);
 
             $table->timestamps();

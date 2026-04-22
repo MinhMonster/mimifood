@@ -38,7 +38,8 @@ class Avatar extends Model
         'land',
         'pets',
         'fish',
-        'sex'
+        'sex',
+        'owner',
     ];
 
     protected $casts = [
@@ -68,6 +69,7 @@ class Avatar extends Model
             'sex' => ['sex'],
             'cash' => ['selling_price', 'range'],
             'is_sold' => ['is_sold'],
+            'owner' => ['owner'],
             'deleted_at' => function (Builder $query, $value) {
                 if ((int) $value === 1) {
                     // Deleted
